@@ -7,12 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadAlertasCount } from "@/hooks/useData";
+import { useRealtimeAlertas } from "@/hooks/useRealtimeAlertas";
 
 export function DashboardLayout() {
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
   const { data: unreadCount } = useUnreadAlertasCount();
   const navigate = useNavigate();
+  useRealtimeAlertas();
 
   const initials = user?.user_metadata?.full_name
     ? user.user_metadata.full_name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()

@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { User, Phone, FileText, Save, Loader2, Camera, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { profileSchema } from "@/lib/validations";
 
 export default function Perfil() {
   const { user } = useAuth();
@@ -111,13 +112,21 @@ export default function Perfil() {
 
   const handleSave = async () => {
     if (!user) return;
+
+    const result = profileSchema.safeParse({ fullName, oab, whatsappPhone });
+    if (!result.success) {
+      const firstError = result.error.issues[0]?.message;
+      toast.error(firstError || "Dados inválidos");
+      return;
+    }
+
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
       .update({
-        full_name: fullName,
-        oab,
-        whatsapp_phone: whatsappPhone,
+        full_name: result.data.fullName,
+        oab: result.data.oab || null,
+        whatsapp_phone: result.data.whatsappPhone || null,
       })
       .eq("user_id", user.id);
 
