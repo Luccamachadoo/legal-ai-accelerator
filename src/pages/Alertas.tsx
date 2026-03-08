@@ -80,7 +80,7 @@ export default function Alertas() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-sm">{alerta.contatos?.name ?? "Contato"}</h3>
                           <Badge variant="outline" className="text-[11px] bg-primary/10 text-primary border-primary/30">
-                            {Math.round(alerta.score * 100)}% score
+                            {alerta.score}% score
                           </Badge>
                           {!alerta.read && (
                             <span className="h-2 w-2 rounded-full bg-primary animate-pulse-gold" />

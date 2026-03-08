@@ -222,7 +222,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <p className="text-sm font-semibold text-primary">
-                          {Math.round(alert.score * 100)}%
+                          {alert.score}%
                         </p>
                         <p className="text-[11px] text-muted-foreground">score</p>
                       </div>
