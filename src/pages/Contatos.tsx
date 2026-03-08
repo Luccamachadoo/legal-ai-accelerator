@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ import { demandLabels, statusConfig, PAGE_SIZE } from "@/lib/constants";
 import { toast } from "sonner";
 
 export default function Contatos() {
+  useEffect(() => { document.title = "Contatos — Holly AI"; }, []);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [page, setPage] = useState(0);

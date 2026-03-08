@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -85,6 +86,7 @@ function OnboardingCard() {
 }
 
 export default function Dashboard() {
+  useEffect(() => { document.title = "Dashboard — Holly AI"; }, []);
   const { data: stats, isLoading: statsLoading } = useContatosStats();
   const { data: msgCount } = useMensagensCount();
   const { data: alertas } = useAlertas();

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ const demandLabels: Record<string, string> = {
 };
 
 export default function Alertas() {
+  useEffect(() => { document.title = "Alertas — Holly AI"; }, []);
   const { data: alertas, isLoading } = useAlertas();
   const markRead = useMarkAlertaRead();
 
