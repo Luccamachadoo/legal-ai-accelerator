@@ -15,6 +15,7 @@ import Configuracoes from "@/pages/Configuracoes";
 import Perfil from "@/pages/Perfil";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
+import Agendar from "@/pages/Agendar";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import LandingPage from "@/pages/LandingPage";
