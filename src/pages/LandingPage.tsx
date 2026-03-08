@@ -65,6 +65,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 export default function LandingPage() {
   const navigate = useNavigate();
   const goSignup = () => navigate("/signup");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Holly AI — Reative leads e converta mais clientes | WhatsApp para Advogados";
