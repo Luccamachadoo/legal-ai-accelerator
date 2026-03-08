@@ -145,6 +145,45 @@ export type Database = {
         }
         Relationships: []
       }
+      integracoes_chatwoot: {
+        Row: {
+          chatwoot_account_id: string
+          chatwoot_api_token: string
+          chatwoot_base_url: string
+          chatwoot_inbox_id: string
+          created_at: string
+          enabled: boolean
+          id: string
+          updated_at: string
+          user_id: string
+          webhook_secret: string
+        }
+        Insert: {
+          chatwoot_account_id?: string
+          chatwoot_api_token?: string
+          chatwoot_base_url?: string
+          chatwoot_inbox_id?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          updated_at?: string
+          user_id: string
+          webhook_secret?: string
+        }
+        Update: {
+          chatwoot_account_id?: string
+          chatwoot_api_token?: string
+          chatwoot_base_url?: string
+          chatwoot_inbox_id?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          updated_at?: string
+          user_id?: string
+          webhook_secret?: string
+        }
+        Relationships: []
+      }
       mensagens: {
         Row: {
           ai_class: string | null

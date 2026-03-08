@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,11 +12,14 @@ import {
   Send,
   Inbox,
   User,
+  Loader2,
 } from "lucide-react";
 import { useContatos } from "@/hooks/useData";
 import { useMensagens } from "@/hooks/useMensagens";
+import { useSendChatwootMessage, useChatwootConfig } from "@/hooks/useChatwoot";
 import { formatDistanceToNow, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toast } from "sonner";
 
 import { demandLabels } from "@/lib/constants";
 
@@ -24,8 +27,13 @@ export default function Mensagens() {
   useEffect(() => { document.title = "Mensagens — Holly AI"; }, []);
   const [selectedContatoId, setSelectedContatoId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [msgInput, setMsgInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
   const { data: contatos, isLoading: contatosLoading } = useContatos();
   const { data: mensagens, isLoading: msgsLoading } = useMensagens(selectedContatoId);
+  const sendMessage = useSendChatwootMessage();
+  const { data: chatwootConfig } = useChatwootConfig();
+  const isChatwootEnabled = chatwootConfig?.enabled ?? false;
 
   const filtered = (contatos ?? []).filter(
     (c) =>
@@ -225,6 +233,53 @@ export default function Mensagens() {
                       </div>
                     )}
                   </ScrollArea>
+
+                  {/* Send input */}
+                  <div className="p-3 border-t border-border/50">
+                    {isChatwootEnabled ? (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!msgInput.trim() || !selectedContatoId) return;
+                          sendMessage.mutate(
+                            { contato_id: selectedContatoId, content: msgInput.trim() },
+                            { onSuccess: () => setMsgInput("") }
+                          );
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <Input
+                          placeholder="Digite sua mensagem..."
+                          value={msgInput}
+                          onChange={(e) => setMsgInput(e.target.value)}
+                          className="flex-1 h-9 text-sm"
+                          disabled={sendMessage.isPending}
+                        />
+                        <Button
+                          type="submit"
+                          size="icon"
+                          className="holly-gradient border-0 text-primary-foreground h-9 w-9 shrink-0"
+                          disabled={sendMessage.isPending || !msgInput.trim()}
+                        >
+                          {sendMessage.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Send className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </form>
+                    ) : (
+                      <div className="text-center py-1">
+                        <p className="text-xs text-muted-foreground">
+                          Ative a integração Chatwoot em{" "}
+                          <a href="/configuracoes" className="text-primary underline underline-offset-2">
+                            Configurações
+                          </a>{" "}
+                          para enviar mensagens
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
