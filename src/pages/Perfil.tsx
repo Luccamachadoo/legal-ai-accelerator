@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,13 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User, Phone, FileText, Save, Loader2 } from "lucide-react";
+import { User, Phone, FileText, Save, Loader2, Camera, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Perfil() {
   const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [fullName, setFullName] = useState("");
   const [oab, setOab] = useState("");
   const [whatsappPhone, setWhatsappPhone] = useState("");
@@ -26,7 +28,7 @@ export default function Perfil() {
       .select("*")
       .eq("user_id", user.id)
       .single()
-      .then(({ data, error }) => {
+      .then(({ data }) => {
         if (data) {
           setFullName(data.full_name ?? "");
           setOab(data.oab ?? "");
@@ -36,6 +38,76 @@ export default function Perfil() {
         setLoading(false);
       });
   }, [user]);
+
+  const uploadAvatar = async (file: File) => {
+    if (!user) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 2MB");
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const filePath = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      toast.error("Erro ao enviar imagem");
+      setUploading(false);
+      return;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+
+    const newUrl = `${publicUrlData.publicUrl}?t=${Date.now()}`;
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar_url: newUrl })
+      .eq("user_id", user.id);
+
+    if (updateError) {
+      toast.error("Erro ao atualizar perfil");
+    } else {
+      setAvatarUrl(newUrl);
+      toast.success("Foto atualizada!");
+    }
+    setUploading(false);
+  };
+
+  const removeAvatar = async () => {
+    if (!user) return;
+    setUploading(true);
+
+    // List files in user folder and delete them
+    const { data: files } = await supabase.storage
+      .from("avatars")
+      .list(user.id);
+
+    if (files && files.length > 0) {
+      await supabase.storage
+        .from("avatars")
+        .remove(files.map((f) => `${user.id}/${f.name}`));
+    }
+
+    await supabase
+      .from("profiles")
+      .update({ avatar_url: null })
+      .eq("user_id", user.id);
+
+    setAvatarUrl("");
+    toast.success("Foto removida");
+    setUploading(false);
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -85,12 +157,61 @@ export default function Perfil() {
         {/* Avatar Card */}
         <Card className="md:col-span-1">
           <CardContent className="flex flex-col items-center pt-8 pb-6 gap-4">
-            <Avatar className="h-24 w-24 text-2xl">
-              <AvatarImage src={avatarUrl} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-semibold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative group">
+              <Avatar className="h-24 w-24 text-2xl">
+                <AvatarImage src={avatarUrl} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                {uploading ? (
+                  <Loader2 className="h-6 w-6 text-background animate-spin" />
+                ) : (
+                  <Camera className="h-6 w-6 text-background" />
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) uploadAvatar(file);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                <Camera className="h-3.5 w-3.5 mr-1.5" />
+                {avatarUrl ? "Trocar foto" : "Enviar foto"}
+              </Button>
+              {avatarUrl && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={removeAvatar}
+                  disabled={uploading}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                  Remover
+                </Button>
+              )}
+            </div>
+
             <div className="text-center">
               <p className="font-semibold text-lg text-foreground">{fullName || "Sem nome"}</p>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
@@ -101,6 +222,7 @@ export default function Perfil() {
                 OAB {oab}
               </span>
             )}
+            <p className="text-xs text-muted-foreground text-center">JPG, PNG ou WebP • Máx. 2MB</p>
           </CardContent>
         </Card>
 
