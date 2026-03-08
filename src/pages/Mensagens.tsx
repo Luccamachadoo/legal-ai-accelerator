@@ -285,7 +285,6 @@ export default function Mensagens() {
             </AnimatePresence>
           </CardContent>
         </Card>
-        </Card>
       </div>
     </motion.div>
   );
