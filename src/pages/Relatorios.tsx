@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Calendar, TrendingUp, Users, RefreshCw, AlertTriangle, Inbox } from "lucide-react";
 import { useRelatorios, useContatosStats } from "@/hooks/useData";
+import { toast } from "sonner";
 
 export default function Relatorios() {
   const { data: relatorios, isLoading } = useRelatorios();
@@ -20,6 +21,62 @@ export default function Relatorios() {
     { title: "Esfriados", value: `${stats?.esfriados ?? 0}`, target: "—", met: false, icon: AlertTriangle },
   ];
 
+  const exportPDF = () => {
+    // Generate a simple printable report
+    const w = window.open("", "_blank");
+    if (!w) {
+      toast.error("Pop-up bloqueado. Permita pop-ups para exportar.");
+      return;
+    }
+
+    const contatos = stats?.contatos ?? [];
+    const statusCounts = {
+      novo: contatos.filter((c) => c.status === "novo").length,
+      quente: (stats?.quentes ?? 0),
+      esfriado: (stats?.esfriados ?? 0),
+      reativado: (stats?.reativados ?? 0),
+      fechado: (stats?.fechados ?? 0),
+    };
+
+    w.document.write(`<!DOCTYPE html><html><head><title>Relatório Holly AI</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px; color: #1a1a1a; max-width: 800px; margin: 0 auto; }
+        h1 { font-size: 24px; margin-bottom: 4px; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 32px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        .kpi { border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; }
+        .kpi-value { font-size: 28px; font-weight: 700; }
+        .kpi-label { font-size: 12px; color: #666; margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #e5e5e5; font-size: 13px; }
+        th { font-weight: 600; background: #f9f9f9; }
+        .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e5e5; font-size: 11px; color: #999; }
+        @media print { body { padding: 20px; } }
+      </style></head><body>
+      <h1>Relatório de Performance — Holly AI</h1>
+      <p class="subtitle">Gerado em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}</p>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-value">${taxaReativacao}%</div><div class="kpi-label">Taxa Reativação</div></div>
+        <div class="kpi"><div class="kpi-value">${total}</div><div class="kpi-label">Contatos Ativos</div></div>
+        <div class="kpi"><div class="kpi-value">${reativados}</div><div class="kpi-label">Reativados</div></div>
+        <div class="kpi"><div class="kpi-value">${stats?.esfriados ?? 0}</div><div class="kpi-label">Esfriados</div></div>
+      </div>
+      <h2 style="font-size:16px;margin-bottom:8px;">Distribuição por Status</h2>
+      <table>
+        <thead><tr><th>Status</th><th>Quantidade</th><th>%</th></tr></thead>
+        <tbody>
+          ${Object.entries(statusCounts).map(([k, v]) =>
+            `<tr><td>${k.charAt(0).toUpperCase() + k.slice(1)}</td><td>${v}</td><td>${total > 0 ? Math.round((v / total) * 100) : 0}%</td></tr>`
+          ).join("")}
+        </tbody>
+      </table>
+      <div class="footer">Holly AI — Protocolo de Dupla Atuação HOLLY™ • Este relatório é confidencial.</div>
+      <script>window.print();</script>
+    </body></html>`);
+    w.document.close();
+    toast.success("Relatório gerado! Use Ctrl+P para salvar como PDF.");
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -34,7 +91,11 @@ export default function Relatorios() {
             Consolidado de performance
           </p>
         </div>
-        <Button size="sm" className="holly-gradient border-0 text-primary-foreground hover:opacity-90">
+        <Button
+          size="sm"
+          className="holly-gradient border-0 text-primary-foreground hover:opacity-90"
+          onClick={exportPDF}
+        >
           <Download className="h-3.5 w-3.5 mr-1.5" />
           Export PDF
         </Button>
@@ -97,7 +158,7 @@ export default function Relatorios() {
                       <p className="text-xs text-muted-foreground">{rel.reativacoes} reativações</p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={exportPDF}>
                     <Download className="h-3.5 w-3.5 mr-1" />
                     PDF
                   </Button>
