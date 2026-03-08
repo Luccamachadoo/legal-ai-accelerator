@@ -52,6 +52,60 @@ export type Database = {
           },
         ]
       }
+      configuracoes: {
+        Row: {
+          created_at: string
+          id: string
+          lgpd_anonimizacao: boolean
+          lgpd_auditoria: boolean
+          lgpd_consentimento: boolean
+          recuperacao_max_tentativas: number
+          recuperacao_opt_out_auto: boolean
+          recuperacao_template_d2: string
+          recuperacao_timing_dias: number[]
+          secretaria_horario_comercial: boolean
+          secretaria_resposta_auto: boolean
+          secretaria_template_boas_vindas: string
+          secretaria_tom: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lgpd_anonimizacao?: boolean
+          lgpd_auditoria?: boolean
+          lgpd_consentimento?: boolean
+          recuperacao_max_tentativas?: number
+          recuperacao_opt_out_auto?: boolean
+          recuperacao_template_d2?: string
+          recuperacao_timing_dias?: number[]
+          secretaria_horario_comercial?: boolean
+          secretaria_resposta_auto?: boolean
+          secretaria_template_boas_vindas?: string
+          secretaria_tom?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lgpd_anonimizacao?: boolean
+          lgpd_auditoria?: boolean
+          lgpd_consentimento?: boolean
+          recuperacao_max_tentativas?: number
+          recuperacao_opt_out_auto?: boolean
+          recuperacao_template_d2?: string
+          recuperacao_timing_dias?: number[]
+          secretaria_horario_comercial?: boolean
+          secretaria_resposta_auto?: boolean
+          secretaria_template_boas_vindas?: string
+          secretaria_tom?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contatos: {
         Row: {
           advogado_id: string

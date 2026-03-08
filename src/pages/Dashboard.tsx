@@ -6,14 +6,15 @@ import {
   MessageSquare,
   RefreshCw,
   TrendingUp,
-  ArrowUpRight,
   Flame,
   Clock,
   Inbox,
+  Rocket,
+  Settings,
+  Phone,
+  CheckCircle2,
 } from "lucide-react";
 import {
-  AreaChart,
-  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -25,6 +26,8 @@ import {
 import { useContatosStats, useMensagensCount, useAlertas } from "@/hooks/useData";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const container = {
   hidden: { opacity: 0 },
@@ -44,12 +47,56 @@ const demandLabels: Record<string, string> = {
   outros: "Outros",
 };
 
+function OnboardingCard() {
+  const navigate = useNavigate();
+
+  const steps = [
+    { label: "Configure seu perfil", href: "/perfil", icon: Users, done: false },
+    { label: "Ajuste os agentes", href: "/configuracoes", icon: Settings, done: false },
+    { label: "Conecte seu WhatsApp", href: "#", icon: Phone, done: false },
+  ];
+
+  return (
+    <Card className="holly-card-shadow border-primary/20 bg-primary/5">
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Rocket className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <CardTitle className="text-base">Bem-vindo ao Holly AI!</CardTitle>
+            <p className="text-sm text-muted-foreground">Complete a configuração para começar a operar</p>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {steps.map((step, i) => (
+            <button
+              key={i}
+              onClick={() => step.href !== "#" && navigate(step.href)}
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-background border border-border/50 hover:border-primary/30 transition-colors text-left"
+            >
+              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                <step.icon className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <span className="text-sm font-medium text-foreground">{step.label}</span>
+              <span className="ml-auto text-xs text-muted-foreground">Pendente</span>
+            </button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useContatosStats();
   const { data: msgCount } = useMensagensCount();
   const { data: alertas } = useAlertas();
 
   const hotAlerts = (alertas ?? []).filter((a) => !a.read).slice(0, 4);
+  const isEmpty = !statsLoading && (stats?.total ?? 0) === 0;
 
   const kpis = [
     {
@@ -91,6 +138,13 @@ export default function Dashboard() {
         </p>
       </motion.div>
 
+      {/* Onboarding when empty */}
+      {isEmpty && (
+        <motion.div variants={item}>
+          <OnboardingCard />
+        </motion.div>
+      )}
+
       {/* Stats */}
       <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((stat) => (
@@ -111,7 +165,6 @@ export default function Dashboard() {
 
       {/* Charts */}
       <motion.div variants={item} className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Status Distribution - simple bars */}
         <Card className="lg:col-span-2 holly-card-shadow border-border/50">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">Distribuição por Status</CardTitle>
@@ -119,6 +172,12 @@ export default function Dashboard() {
           <CardContent>
             {statsLoading ? (
               <div className="h-[200px] flex items-center justify-center text-muted-foreground text-sm">Carregando...</div>
+            ) : isEmpty ? (
+              <div className="h-[200px] flex flex-col items-center justify-center text-muted-foreground text-sm gap-2">
+                <Inbox className="h-8 w-8" />
+                <p>Nenhum contato ainda</p>
+                <p className="text-xs">Os dados aparecerão aqui quando o protocolo começar a operar</p>
+              </div>
             ) : (
               <div className="space-y-3 py-4">
                 {[
@@ -144,7 +203,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Demand Distribution */}
         <Card className="holly-card-shadow border-border/50">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">Demandas</CardTitle>
@@ -159,18 +217,19 @@ export default function Dashboard() {
               <div className="h-[240px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={demandData} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 90%)" />
-                    <XAxis type="number" tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" />
-                    <YAxis type="category" dataKey="tipo" tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" width={80} />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                    <XAxis type="number" tick={{ fontSize: 11 }} className="fill-muted-foreground" />
+                    <YAxis type="category" dataKey="tipo" tick={{ fontSize: 11 }} className="fill-muted-foreground" width={80} />
                     <Tooltip
                       contentStyle={{
-                        background: "hsl(0, 0%, 100%)",
-                        border: "1px solid hsl(220, 15%, 90%)",
+                        background: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
                         borderRadius: "8px",
                         fontSize: "12px",
+                        color: "hsl(var(--foreground))",
                       }}
                     />
-                    <Bar dataKey="qtd" fill="hsl(40, 80%, 50%)" radius={[0, 4, 4, 0]} name="Quantidade" />
+                    <Bar dataKey="qtd" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} name="Quantidade" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -197,7 +256,14 @@ export default function Dashboard() {
             {hotAlerts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-muted-foreground text-sm gap-2">
                 <Inbox className="h-8 w-8" />
-                Nenhum alerta pendente
+                {isEmpty ? (
+                  <>
+                    <p>Aguardando os primeiros contatos</p>
+                    <p className="text-xs">Alertas de leads quentes aparecerão aqui automaticamente</p>
+                  </>
+                ) : (
+                  <p>Nenhum alerta pendente</p>
+                )}
               </div>
             ) : (
               <div className="space-y-3">
