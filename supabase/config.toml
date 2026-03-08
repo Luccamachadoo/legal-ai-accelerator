@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.chatwoot-send]
 verify_jwt = false
+
+[functions.ai-secretaria]
+verify_jwt = false
+
+[functions.ai-recuperacao]
+verify_jwt = false
