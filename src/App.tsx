@@ -9,6 +9,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import Dashboard from "@/pages/Dashboard";
 import Contatos from "@/pages/Contatos";
 import Alertas from "@/pages/Alertas";
+import Mensagens from "@/pages/Mensagens";
 import Relatorios from "@/pages/Relatorios";
 import Configuracoes from "@/pages/Configuracoes";
 import Perfil from "@/pages/Perfil";
@@ -56,6 +57,7 @@ const App = () => (
             >
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/contatos" element={<Contatos />} />
+              <Route path="/mensagens" element={<Mensagens />} />
               <Route path="/alertas" element={<Alertas />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/configuracoes" element={<Configuracoes />} />
