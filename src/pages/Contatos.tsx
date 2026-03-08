@@ -18,31 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, Download } from "lucide-react";
+import { Search, Filter, Download, Inbox } from "lucide-react";
 import { useState } from "react";
+import { useContatos } from "@/hooks/useData";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import type { Database } from "@/integrations/supabase/types";
 
-type ContatoStatus = "novo" | "quente" | "esfriado" | "reativado" | "fechado";
-
-interface Contato {
-  id: string;
-  name: string;
-  phone: string;
-  demand: string;
-  status: ContatoStatus;
-  score: number;
-  lastMsg: string;
-}
-
-const mockContatos: Contato[] = [
-  { id: "1", name: "Maria Santos", phone: "+55 79 9****-1234", demand: "Aposentadoria", status: "quente", score: 0.92, lastMsg: "Há 2 min" },
-  { id: "2", name: "João Costa", phone: "+55 79 9****-5678", demand: "INSS", status: "quente", score: 0.87, lastMsg: "Há 15 min" },
-  { id: "3", name: "Ana Oliveira", phone: "+55 79 9****-9012", demand: "BPC/LOAS", status: "novo", score: 0.65, lastMsg: "Há 1h" },
-  { id: "4", name: "Carlos Lima", phone: "+55 79 9****-3456", demand: "Revisão", status: "esfriado", score: 0.45, lastMsg: "Há 3 dias" },
-  { id: "5", name: "Fernanda Alves", phone: "+55 79 9****-7890", demand: "Aposentadoria", status: "reativado", score: 0.78, lastMsg: "Há 30 min" },
-  { id: "6", name: "Roberto Souza", phone: "+55 79 9****-2345", demand: "INSS", status: "fechado", score: 0.95, lastMsg: "Há 5 dias" },
-  { id: "7", name: "Lucia Pereira", phone: "+55 79 9****-6789", demand: "BPC/LOAS", status: "esfriado", score: 0.32, lastMsg: "Há 7 dias" },
-  { id: "8", name: "Pedro Mendes", phone: "+55 79 9****-0123", demand: "Aposentadoria", status: "novo", score: 0.7, lastMsg: "Há 45 min" },
-];
+type ContatoStatus = Database["public"]["Enums"]["contato_status"];
 
 const statusConfig: Record<ContatoStatus, { label: string; className: string }> = {
   novo: { label: "Novo", className: "bg-holly-info/10 text-holly-info border-holly-info/30" },
@@ -52,15 +35,30 @@ const statusConfig: Record<ContatoStatus, { label: string; className: string }> 
   fechado: { label: "Fechado", className: "bg-holly-navy/10 text-foreground border-border" },
 };
 
+const demandLabels: Record<string, string> = {
+  aposentadoria: "Aposentadoria",
+  inss: "INSS",
+  bpc_loas: "BPC/LOAS",
+  revisao: "Revisão",
+  outros: "Outros",
+};
+
 export default function Contatos() {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("todos");
+  const [statusFilter, setStatusFilter] = useState("todos");
+  const { data: contatos, isLoading } = useContatos(statusFilter);
 
-  const filtered = mockContatos.filter((c) => {
-    const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "todos" || c.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
+  const filtered = (contatos ?? []).filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase()) ||
+    c.phone.includes(search)
+  );
+
+  const maskPhone = (phone: string) => {
+    if (phone.length > 8) {
+      return phone.slice(0, -4).replace(/.(?=.{4})/g, (m, i) => (i > phone.length - 9 ? "*" : m)) + phone.slice(-4);
+    }
+    return phone;
+  };
 
   return (
     <motion.div
@@ -113,48 +111,61 @@ export default function Contatos() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead>Demanda</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Score</TableHead>
-                <TableHead className="text-right">Última Msg</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((contato) => (
-                <TableRow key={contato.id} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="font-medium">{contato.name}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{contato.phone}</TableCell>
-                  <TableCell>{contato.demand}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={statusConfig[contato.status].className}>
-                      {statusConfig[contato.status].label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span
-                      className={`font-semibold text-sm ${
-                        contato.score >= 0.8
-                          ? "text-primary"
-                          : contato.score >= 0.5
-                          ? "text-holly-warning"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {Math.round(contato.score * 100)}%
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right text-sm text-muted-foreground">
-                    {contato.lastMsg}
-                  </TableCell>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
+              Carregando...
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground text-sm gap-2">
+              <Inbox className="h-8 w-8" />
+              {contatos?.length === 0 ? "Nenhum contato ainda" : "Nenhum resultado encontrado"}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead>Demanda</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Score</TableHead>
+                  <TableHead className="text-right">Última Msg</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((contato) => (
+                  <TableRow key={contato.id} className="cursor-pointer hover:bg-muted/50">
+                    <TableCell className="font-medium">{contato.name || "Sem nome"}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{maskPhone(contato.phone)}</TableCell>
+                    <TableCell>{demandLabels[contato.demand_type ?? ""] ?? "—"}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={statusConfig[contato.status].className}>
+                        {statusConfig[contato.status].label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span
+                        className={`font-semibold text-sm ${
+                          contato.score_hot >= 0.8
+                            ? "text-primary"
+                            : contato.score_hot >= 0.5
+                            ? "text-holly-warning"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        {Math.round(contato.score_hot * 100)}%
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right text-sm text-muted-foreground">
+                      {contato.last_msg_at
+                        ? formatDistanceToNow(new Date(contato.last_msg_at), { addSuffix: true, locale: ptBR })
+                        : "—"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </motion.div>

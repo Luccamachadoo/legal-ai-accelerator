@@ -14,6 +14,118 @@ export type Database = {
   }
   public: {
     Tables: {
+      alertas: {
+        Row: {
+          advogado_id: string
+          contato_id: string
+          created_at: string
+          id: string
+          read: boolean
+          score: number
+          summary: string
+        }
+        Insert: {
+          advogado_id: string
+          contato_id: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          score?: number
+          summary: string
+        }
+        Update: {
+          advogado_id?: string
+          contato_id?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          score?: number
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alertas_contato_id_fkey"
+            columns: ["contato_id"]
+            isOneToOne: false
+            referencedRelation: "contatos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contatos: {
+        Row: {
+          advogado_id: string
+          created_at: string
+          demand_type: Database["public"]["Enums"]["demand_type"] | null
+          id: string
+          last_msg_at: string | null
+          name: string
+          phone: string
+          score_hot: number
+          status: Database["public"]["Enums"]["contato_status"]
+          updated_at: string
+        }
+        Insert: {
+          advogado_id: string
+          created_at?: string
+          demand_type?: Database["public"]["Enums"]["demand_type"] | null
+          id?: string
+          last_msg_at?: string | null
+          name?: string
+          phone: string
+          score_hot?: number
+          status?: Database["public"]["Enums"]["contato_status"]
+          updated_at?: string
+        }
+        Update: {
+          advogado_id?: string
+          created_at?: string
+          demand_type?: Database["public"]["Enums"]["demand_type"] | null
+          id?: string
+          last_msg_at?: string | null
+          name?: string
+          phone?: string
+          score_hot?: number
+          status?: Database["public"]["Enums"]["contato_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mensagens: {
+        Row: {
+          ai_class: string | null
+          contato_id: string
+          content: string
+          created_at: string
+          direction: Database["public"]["Enums"]["msg_direction"]
+          id: string
+        }
+        Insert: {
+          ai_class?: string | null
+          contato_id: string
+          content: string
+          created_at?: string
+          direction: Database["public"]["Enums"]["msg_direction"]
+          id?: string
+        }
+        Update: {
+          ai_class?: string | null
+          contato_id?: string
+          content?: string
+          created_at?: string
+          direction?: Database["public"]["Enums"]["msg_direction"]
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensagens_contato_id_fkey"
+            columns: ["contato_id"]
+            isOneToOne: false
+            referencedRelation: "contatos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -47,6 +159,36 @@ export type Database = {
         }
         Relationships: []
       }
+      relatorios: {
+        Row: {
+          advogado_id: string
+          created_at: string
+          id: string
+          metrics_json: Json
+          period_end: string
+          period_start: string
+          reativacoes: number
+        }
+        Insert: {
+          advogado_id: string
+          created_at?: string
+          id?: string
+          metrics_json?: Json
+          period_end: string
+          period_start: string
+          reativacoes?: number
+        }
+        Update: {
+          advogado_id?: string
+          created_at?: string
+          id?: string
+          metrics_json?: Json
+          period_end?: string
+          period_start?: string
+          reativacoes?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -55,7 +197,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      contato_status: "novo" | "quente" | "esfriado" | "reativado" | "fechado"
+      demand_type: "aposentadoria" | "inss" | "bpc_loas" | "revisao" | "outros"
+      msg_direction: "in" | "out"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -182,6 +326,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      contato_status: ["novo", "quente", "esfriado", "reativado", "fechado"],
+      demand_type: ["aposentadoria", "inss", "bpc_loas", "revisao", "outros"],
+      msg_direction: ["in", "out"],
+    },
   },
 } as const
