@@ -40,6 +40,8 @@ const item = {
 };
 
 import { demandLabels } from "@/lib/constants";
+
+function OnboardingCard() {
   const navigate = useNavigate();
 
   const steps = [
