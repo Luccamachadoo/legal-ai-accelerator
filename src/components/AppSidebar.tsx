@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Users,
   Bell,
+  MessageSquare,
   Settings,
   FileText,
   Bot,
@@ -29,6 +30,7 @@ import {
 const mainNav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Contatos", url: "/contatos", icon: Users },
+  { title: "Mensagens", url: "/mensagens", icon: MessageSquare },
   { title: "Alertas", url: "/alertas", icon: Bell },
 ];
 
