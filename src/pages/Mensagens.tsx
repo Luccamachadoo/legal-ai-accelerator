@@ -233,7 +233,56 @@ export default function Mensagens() {
                       </div>
                     )}
                   </ScrollArea>
+
+                  {/* Send input */}
+                  <div className="p-3 border-t border-border/50">
+                    {isChatwootEnabled ? (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!msgInput.trim() || !selectedContatoId) return;
+                          sendMessage.mutate(
+                            { contato_id: selectedContatoId, content: msgInput.trim() },
+                            { onSuccess: () => setMsgInput("") }
+                          );
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <Input
+                          placeholder="Digite sua mensagem..."
+                          value={msgInput}
+                          onChange={(e) => setMsgInput(e.target.value)}
+                          className="flex-1 h-9 text-sm"
+                          disabled={sendMessage.isPending}
+                        />
+                        <Button
+                          type="submit"
+                          size="icon"
+                          className="holly-gradient border-0 text-primary-foreground h-9 w-9 shrink-0"
+                          disabled={sendMessage.isPending || !msgInput.trim()}
+                        >
+                          {sendMessage.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Send className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </form>
+                    ) : (
+                      <div className="text-center py-1">
+                        <p className="text-xs text-muted-foreground">
+                          Ative a integração Chatwoot em{" "}
+                          <a href="/configuracoes" className="text-primary underline underline-offset-2">
+                            Configurações
+                          </a>{" "}
+                          para enviar mensagens
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
+              )}
+            </AnimatePresence>
               )}
             </AnimatePresence>
           </CardContent>
