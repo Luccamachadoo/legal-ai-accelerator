@@ -88,7 +88,7 @@ export default function LandingPage() {
             <a href="#depoimentos" className="hover:text-foreground transition-colors">Depoimentos</a>
             <a href="#precos" className="hover:text-foreground transition-colors">Preços</a>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
               Entrar
             </Button>
@@ -96,7 +96,51 @@ export default function LandingPage() {
               Começar grátis
             </Button>
           </div>
+          <button
+            className="md:hidden p-2 text-foreground"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menu"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden border-t border-border bg-background/95 backdrop-blur-md"
+          >
+            <div className="flex flex-col px-6 py-4 gap-3">
+              {[
+                { href: "#beneficios", label: "Benefícios" },
+                { href: "#como-funciona", label: "Como Funciona" },
+                { href: "#depoimentos", label: "Depoimentos" },
+                { href: "#precos", label: "Preços" },
+              ].map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <Separator />
+              <div className="flex gap-3 pt-1">
+                <Button variant="ghost" size="sm" className="flex-1" onClick={() => navigate("/login")}>
+                  Entrar
+                </Button>
+                <Button size="sm" className="flex-1" onClick={goSignup}>
+                  Começar grátis
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </nav>
 
       {/* ─── Hero ─── */}
