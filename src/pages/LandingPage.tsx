@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 import { motion, type Easing } from "framer-motion";
 import {
   Bot,
@@ -686,6 +687,8 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <WhatsAppFloatingButton phoneNumber="5511999999999" />
     </div>
   );
 }
