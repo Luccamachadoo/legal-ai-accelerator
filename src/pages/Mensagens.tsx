@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,11 +12,14 @@ import {
   Send,
   Inbox,
   User,
+  Loader2,
 } from "lucide-react";
 import { useContatos } from "@/hooks/useData";
 import { useMensagens } from "@/hooks/useMensagens";
+import { useSendChatwootMessage, useChatwootConfig } from "@/hooks/useChatwoot";
 import { formatDistanceToNow, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toast } from "sonner";
 
 import { demandLabels } from "@/lib/constants";
 
@@ -24,8 +27,13 @@ export default function Mensagens() {
   useEffect(() => { document.title = "Mensagens — Holly AI"; }, []);
   const [selectedContatoId, setSelectedContatoId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [msgInput, setMsgInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
   const { data: contatos, isLoading: contatosLoading } = useContatos();
   const { data: mensagens, isLoading: msgsLoading } = useMensagens(selectedContatoId);
+  const sendMessage = useSendChatwootMessage();
+  const { data: chatwootConfig } = useChatwootConfig();
+  const isChatwootEnabled = chatwootConfig?.enabled ?? false;
 
   const filtered = (contatos ?? []).filter(
     (c) =>
