@@ -39,13 +39,7 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
 };
 
-const demandLabels: Record<string, string> = {
-  aposentadoria: "Aposentadoria",
-  inss: "INSS",
-  bpc_loas: "BPC/LOAS",
-  revisao: "Revisão",
-  outros: "Outros",
-};
+import { demandLabels } from "@/lib/constants";
 
 function OnboardingCard() {
   const navigate = useNavigate();

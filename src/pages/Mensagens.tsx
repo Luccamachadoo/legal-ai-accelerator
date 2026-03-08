@@ -18,13 +18,7 @@ import { useMensagens } from "@/hooks/useMensagens";
 import { formatDistanceToNow, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const demandLabels: Record<string, string> = {
-  aposentadoria: "Aposentadoria",
-  inss: "INSS",
-  bpc_loas: "BPC/LOAS",
-  revisao: "Revisão",
-  outros: "Outros",
-};
+import { demandLabels } from "@/lib/constants";
 
 export default function Mensagens() {
   const [selectedContatoId, setSelectedContatoId] = useState<string | null>(null);
