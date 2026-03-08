@@ -11,6 +11,7 @@ import Contatos from "@/pages/Contatos";
 import Alertas from "@/pages/Alertas";
 import Relatorios from "@/pages/Relatorios";
 import Configuracoes from "@/pages/Configuracoes";
+import Perfil from "@/pages/Perfil";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import ForgotPassword from "@/pages/ForgotPassword";
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/alertas" element={<Alertas />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/configuracoes" element={<Configuracoes />} />
+              <Route path="/perfil" element={<Perfil />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

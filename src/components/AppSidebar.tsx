@@ -6,6 +6,7 @@ import {
   FileText,
   Bot,
   LogOut,
+  UserCircle,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -33,6 +34,7 @@ const mainNav = [
 
 const secondaryNav = [
   { title: "Relatórios", url: "/relatorios", icon: FileText },
+  { title: "Meu Perfil", url: "/perfil", icon: UserCircle },
   { title: "Configurações", url: "/configuracoes", icon: Settings },
 ];
 
