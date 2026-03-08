@@ -6,13 +6,17 @@ import { Button } from "@/components/ui/button";
 
 const CALENDLY_URL = "https://calendly.com/lvinicius212/30min";
 
+function useIsDark() {
+  // Check if dark class is on <html>
+  return document.documentElement.classList.contains("dark");
+}
+
 export default function Agendar() {
   const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Agendar Conversa — Holly AI";
 
-    // Load Calendly widget script
     const script = document.createElement("script");
     script.src = "https://assets.calendly.com/assets/external/widget.js";
     script.async = true;
@@ -22,6 +26,13 @@ export default function Agendar() {
       document.body.removeChild(script);
     };
   }, []);
+
+  const isDark = useIsDark();
+
+  // Match theme colors
+  const bgColor = isDark ? "0f1117" : "f5f6f8";
+  const textColor = isDark ? "e8eaed" : "181c24";
+  const primaryColor = "c8960a"; // hsl(40, 80%, 50%) → hex approx
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -66,11 +77,11 @@ export default function Agendar() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15 }}
-          className="rounded-xl border border-border overflow-hidden bg-card"
+          className="rounded-xl border border-border overflow-hidden"
         >
           <div
             className="calendly-inline-widget"
-            data-url={`${CALENDLY_URL}?hide_gdpr_banner=1&background_color=0a0a0a&text_color=fafafa&primary_color=6d28d9`}
+            data-url={`${CALENDLY_URL}?hide_gdpr_banner=1&background_color=${bgColor}&text_color=${textColor}&primary_color=${primaryColor}`}
             style={{ minWidth: "320px", height: "700px" }}
           />
         </motion.div>
