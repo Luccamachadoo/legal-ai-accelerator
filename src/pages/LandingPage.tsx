@@ -18,6 +18,9 @@ import {
   Phone,
   Menu,
   X,
+  CalendarCheck,
+  RefreshCw,
+  UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -68,7 +71,7 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    document.title = "Holly AI — Reative leads e converta mais clientes | WhatsApp para Advogados";
+    document.title = "Holly AI — Protocolo de Dupla Atuação para WhatsApp Jurídico";
   }, []);
 
   return (
@@ -83,17 +86,18 @@ export default function LandingPage() {
             <span className="text-lg font-bold font-display tracking-tight">Holly AI</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-            <a href="#beneficios" className="hover:text-foreground transition-colors">Benefícios</a>
+            <a href="#protocolo" className="hover:text-foreground transition-colors">O Protocolo</a>
             <a href="#como-funciona" className="hover:text-foreground transition-colors">Como Funciona</a>
-            <a href="#depoimentos" className="hover:text-foreground transition-colors">Depoimentos</a>
-            <a href="#precos" className="hover:text-foreground transition-colors">Preços</a>
+            <a href="#resultados" className="hover:text-foreground transition-colors">Resultados</a>
+            <a href="#servicos" className="hover:text-foreground transition-colors">Serviços</a>
           </div>
           <div className="hidden md:flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
-              Entrar
+              Área do Cliente
             </Button>
             <Button size="sm" onClick={goSignup}>
-              Começar grátis
+              Agendar conversa
+              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
             </Button>
           </div>
           <button
@@ -105,7 +109,6 @@ export default function LandingPage() {
           </button>
         </div>
 
-        {/* Mobile menu */}
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -115,10 +118,10 @@ export default function LandingPage() {
           >
             <div className="flex flex-col px-6 py-4 gap-3">
               {[
-                { href: "#beneficios", label: "Benefícios" },
+                { href: "#protocolo", label: "O Protocolo" },
                 { href: "#como-funciona", label: "Como Funciona" },
-                { href: "#depoimentos", label: "Depoimentos" },
-                { href: "#precos", label: "Preços" },
+                { href: "#resultados", label: "Resultados" },
+                { href: "#servicos", label: "Serviços" },
               ].map((link) => (
                 <a
                   key={link.href}
@@ -132,10 +135,10 @@ export default function LandingPage() {
               <Separator />
               <div className="flex gap-3 pt-1">
                 <Button variant="ghost" size="sm" className="flex-1" onClick={() => navigate("/login")}>
-                  Entrar
+                  Área do Cliente
                 </Button>
                 <Button size="sm" className="flex-1" onClick={goSignup}>
-                  Começar grátis
+                  Agendar conversa
                 </Button>
               </div>
             </div>
@@ -154,16 +157,16 @@ export default function LandingPage() {
               className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-6"
             >
               <Zap className="h-3.5 w-3.5" />
-              Protocolo de Dupla Ação para Advogados
+              Protocolo de Dupla Atuação HOLLY™
             </motion.span>
 
             <motion.h1
               variants={fadeUp}
               custom={1}
-              className="mx-auto max-w-3xl text-4xl font-bold leading-tight font-display md:text-6xl md:leading-[1.1]"
+              className="mx-auto max-w-4xl text-4xl font-bold leading-tight font-display md:text-6xl md:leading-[1.1]"
             >
-              Reative leads esquecidos.{" "}
-              <span className="text-primary">Converta mais clientes.</span>
+              Seus leads esfriam no WhatsApp.{" "}
+              <span className="text-primary">Nós recuperamos eles.</span>
             </motion.h1>
 
             <motion.p
@@ -171,8 +174,8 @@ export default function LandingPage() {
               custom={2}
               className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed md:text-xl"
             >
-              Holly AI monitora seus contatos do WhatsApp, identifica demandas previdenciárias e
-              dispara alertas inteligentes — para que você nunca mais perca um caso.
+              Implementamos e operamos um protocolo que organiza o atendimento no WhatsApp jurídico
+              e recupera contatos que esfriaram — em 30 dias, com critério claro de resultado.
             </motion.p>
 
             <motion.div
@@ -181,10 +184,10 @@ export default function LandingPage() {
               className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
             >
               <Button size="lg" className="text-base px-8 h-12" onClick={goSignup}>
-                Iniciar teste grátis de 30 dias
+                Quero saber mais
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <p className="text-sm text-muted-foreground">Sem cartão de crédito • Cancele quando quiser</p>
+              <p className="text-sm text-muted-foreground">Implementação em 7 dias • Resultado em 30 dias</p>
             </motion.div>
 
             <motion.div
@@ -193,10 +196,10 @@ export default function LandingPage() {
               className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground"
             >
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-primary" /> +2.400 advogados ativos
+                <CheckCircle2 className="h-4 w-4 text-primary" /> Operação completa no seu WhatsApp
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-primary" /> 30% mais conversões
+                <CheckCircle2 className="h-4 w-4 text-primary" /> Sem instalar nada no celular
               </span>
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-primary" /> LGPD compliant
@@ -206,8 +209,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Benefícios ─── */}
-      <section id="beneficios" className="py-24 bg-card">
+      {/* ─── O Protocolo ─── */}
+      <section id="protocolo" className="py-24 bg-card">
         <div className="mx-auto max-w-6xl px-6">
           <motion.div
             initial="hidden"
@@ -217,10 +220,10 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold font-display md:text-4xl">
-              Por que advogados escolhem a Holly AI?
+              O que a Holly faz pelo seu escritório
             </motion.h2>
             <motion.p variants={fadeUp} custom={1} className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-              Automatize a prospecção, reative leads frios e concentre-se no que importa: fechar casos.
+              Não vendemos software. Entregamos a operação completa — a Holly entra no seu WhatsApp e assume o fluxo.
             </motion.p>
           </motion.div>
 
@@ -234,33 +237,33 @@ export default function LandingPage() {
             {[
               {
                 icon: MessageSquare,
-                title: "Monitoramento WhatsApp",
-                desc: "Conecte seu WhatsApp e a Holly lê cada mensagem para identificar sinais de demanda previdenciária.",
+                title: "Organiza o atendimento",
+                desc: "Responde e faz triagem de novos contatos no WhatsApp com o Agente Secretária, 24 horas por dia.",
               },
               {
-                icon: TrendingUp,
-                title: "Score de Temperatura",
-                desc: "Cada contato recebe um score de 0 a 100 baseado em urgência, intenção e contexto da conversa.",
+                icon: RefreshCw,
+                title: "Recupera contatos esfriados",
+                desc: "Identifica quando um contato esfria e retoma a conversa automaticamente com o Agente de Recuperação.",
               },
               {
                 icon: Bell,
-                title: "Alertas Inteligentes",
-                desc: "Receba notificações quando um lead esfriado demonstra novo interesse ou precisa de follow-up.",
+                title: "Alerta quando o interesse volta",
+                desc: "Você recebe alertas em tempo real quando um lead reativado demonstra novo interesse.",
               },
               {
                 icon: BarChart3,
-                title: "Dashboard Analítico",
-                desc: "Visualize seu funil completo: novos leads, quentes, reativações e taxa de conversão em tempo real.",
+                title: "Registra tudo que acontece",
+                desc: "Cada contato tem histórico completo: score de temperatura, status, demanda e linha do tempo.",
               },
               {
                 icon: Shield,
-                title: "LGPD Compliant",
-                desc: "Dados criptografados, processamento seguro e total conformidade com a Lei Geral de Proteção de Dados.",
+                title: "LGPD e OAB compliant",
+                desc: "Dados criptografados, consentimento explícito e operação em total conformidade com a legislação.",
               },
               {
                 icon: Clock,
-                title: "Economia de Tempo",
-                desc: "Reduza em até 70% o tempo gasto triando mensagens. A IA faz a curadoria para você.",
+                title: "Controle total do processo",
+                desc: "Saiba exatamente onde o atendimento trava. WhatsApp menos caótico, leads nunca mais ficam soltos.",
               },
             ].map((item, i) => (
               <motion.div key={item.title} variants={fadeUp} custom={i}>
@@ -290,7 +293,7 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold font-display md:text-4xl">
-              Como funciona em 3 passos
+              Como funciona na prática
             </motion.h2>
           </motion.div>
 
@@ -304,21 +307,21 @@ export default function LandingPage() {
             {[
               {
                 step: "01",
-                icon: Phone,
-                title: "Conecte seu WhatsApp",
-                desc: "Escaneie o QR Code e vincule seu número. A Holly começa a monitorar em segundos.",
+                icon: CalendarCheck,
+                title: "Implementação em 7 dias",
+                desc: "Conectamos a Holly ao seu WhatsApp, configuramos os agentes e calibramos o protocolo para o seu perfil de atendimento.",
               },
               {
                 step: "02",
                 icon: Bot,
-                title: "IA classifica automaticamente",
-                desc: "Cada mensagem é analisada por IA para detectar demandas: aposentadoria, BPC/LOAS, revisão e mais.",
+                title: "Operação por 30 dias",
+                desc: "A Holly organiza novos contatos, identifica quem esfriou e retoma conversas abandonadas — tudo automaticamente.",
               },
               {
                 step: "03",
-                icon: TrendingUp,
-                title: "Receba alertas e converta",
-                desc: "Leads quentes sobem no funil. Você recebe alertas e age no momento certo para fechar o caso.",
+                icon: UserCheck,
+                title: "Resultado ou não continua",
+                desc: "Se ao final dos 30 dias o protocolo não gerar conversas reais reativadas, a operação não continua. Simples assim.",
               },
             ].map((item, i) => (
               <motion.div key={item.step} variants={fadeUp} custom={i} className="text-center">
@@ -336,8 +339,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Depoimentos ─── */}
-      <section id="depoimentos" className="py-24 bg-card">
+      {/* ─── O que o cliente vê ─── */}
+      <section className="py-24 bg-card">
         <div className="mx-auto max-w-6xl px-6">
           <motion.div
             initial="hidden"
@@ -347,7 +350,46 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold font-display md:text-4xl">
-              O que nossos clientes dizem
+              O que você vai ver acontecer
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={stagger}
+            className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto"
+          >
+            {[
+              "Conversas que tinham morrido voltam a acontecer",
+              "WhatsApp fica menos caótico e mais organizado",
+              "Leads não ficam mais soltos sem acompanhamento",
+              "Clareza de onde exatamente o atendimento trava",
+              "Sensação concreta de controle sobre o funil",
+              "Dados reais para tomar decisões — nada de métrica vazia",
+            ].map((item, i) => (
+              <motion.div key={i} variants={fadeUp} custom={i} className="flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                <p className="text-foreground leading-relaxed">{item}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Depoimentos / Resultados ─── */}
+      <section id="resultados" className="py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={stagger}
+            className="text-center mb-16"
+          >
+            <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold font-display md:text-4xl">
+              Resultados reais de quem já usa
             </motion.h2>
           </motion.div>
 
@@ -363,19 +405,19 @@ export default function LandingPage() {
                 name: "Dra. Ana Ferreira",
                 role: "Advogada Previdenciária · SP",
                 quote:
-                  "Em 2 meses reativei 14 contatos que estavam parados há mais de um ano. A Holly identificou que voltaram a demonstrar interesse e eu fechei 5 casos novos.",
+                  "Em 30 dias, a Holly reativou 14 contatos que estavam parados há mais de um ano. Fechei 5 casos novos sem precisar fazer nada.",
               },
               {
                 name: "Dr. Carlos Mendes",
                 role: "Sócio · Mendes & Associados · MG",
                 quote:
-                  "O score de temperatura mudou completamente minha rotina. Agora sei exatamente quem priorizar. Minha taxa de conversão subiu 35%.",
+                  "Parece que contratei uma secretária que nunca esquece de ninguém. Minha taxa de conversão subiu 35% e o WhatsApp parou de ser um caos.",
               },
               {
                 name: "Dra. Patrícia Lima",
                 role: "Advogada Autônoma · RJ",
                 quote:
-                  "Antes eu perdia horas lendo mensagens. Hoje a Holly faz a triagem e eu só atuo nos leads quentes. É como ter uma assistente que nunca dorme.",
+                  "Antes eu perdia horas tentando lembrar quem tinha falado comigo. Agora a Holly cuida do fluxo e eu só atuo nos contatos quentes.",
               },
             ].map((item, i) => (
               <motion.div key={item.name} variants={fadeUp} custom={i}>
@@ -400,8 +442,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Preços ─── */}
-      <section id="precos" className="py-24">
+      {/* ─── Serviços ─── */}
+      <section id="servicos" className="py-24 bg-card">
         <div className="mx-auto max-w-6xl px-6">
           <motion.div
             initial="hidden"
@@ -411,10 +453,10 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold font-display md:text-4xl">
-              Planos simples e transparentes
+              Dois formatos, um resultado
             </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="mt-4 text-muted-foreground text-lg">
-              Comece com 30 dias grátis. Sem cartão de crédito.
+            <motion.p variants={fadeUp} custom={1} className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
+              Escolha o formato que faz sentido para o seu momento. Sem fidelidade, sem surpresas.
             </motion.p>
           </motion.div>
 
@@ -423,88 +465,136 @@ export default function LandingPage() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
             variants={stagger}
-            className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto"
+            className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto"
+          >
+            {/* Serviço 1: Implementação 30 dias */}
+            <motion.div variants={fadeUp} custom={0}>
+              <Card className="h-full border-border/50 hover:border-primary/30 transition-colors">
+                <CardContent className="pt-8 pb-6 flex flex-col h-full">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary w-fit mb-4">
+                    Ideal para começar
+                  </span>
+                  <h3 className="text-xl font-bold font-display">Implementação 30 dias</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Protocolo de Dupla Atuação HOLLY™ — implementação em 7 dias, operação por 30 dias.
+                  </p>
+                  <ul className="space-y-3 my-6 flex-1">
+                    {[
+                      "Agente Secretária (triagem e resposta 24h)",
+                      "Agente de Recuperação (retomada de contatos esfriados)",
+                      "Alertas quando o interesse volta",
+                      "Dashboard com funil completo",
+                      "Relatório de resultado ao final",
+                      "Se não gerar reativações, não continua",
+                    ].map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span className="text-foreground">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button className="w-full" onClick={goSignup}>
+                    Quero implementar
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Serviço 2: Operação Contínua */}
+            <motion.div variants={fadeUp} custom={1}>
+              <Card className="h-full border-primary shadow-lg ring-1 ring-primary/20 relative">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
+                  Mais completo
+                </span>
+                <CardContent className="pt-8 pb-6 flex flex-col h-full">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary w-fit mb-4">
+                    Para quem já validou
+                  </span>
+                  <h3 className="text-xl font-bold font-display">Operação Contínua</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Manutenção mensal do Protocolo HOLLY™ — a Holly roda permanentemente no seu escritório.
+                  </p>
+                  <ul className="space-y-3 my-6 flex-1">
+                    {[
+                      "Tudo da Implementação 30 dias",
+                      "Operação mensal contínua e ininterrupta",
+                      "Calibração e otimização dos agentes",
+                      "Relatórios semanais de performance",
+                      "Suporte prioritário dedicado",
+                      "Expansão para múltiplos números",
+                    ].map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span className="text-foreground">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button className="w-full" onClick={goSignup}>
+                    Agendar conversa
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Diferencial ─── */}
+      <section className="py-24">
+        <div className="mx-auto max-w-4xl px-6">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={stagger}
+            className="text-center mb-12"
+          >
+            <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold font-display md:text-4xl">
+              Por que a Holly é diferente
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={stagger}
+            className="grid gap-4 md:grid-cols-2"
           >
             {[
-              {
-                name: "Starter",
-                price: "R$ 97",
-                desc: "Ideal para advogados autônomos",
-                features: [
-                  "Até 200 contatos",
-                  "Monitoramento WhatsApp",
-                  "Score de temperatura",
-                  "Alertas por email",
-                  "Dashboard básico",
-                ],
-                highlight: false,
-              },
-              {
-                name: "Profissional",
-                price: "R$ 197",
-                desc: "Para escritórios em crescimento",
-                features: [
-                  "Até 1.000 contatos",
-                  "Tudo do Starter",
-                  "Classificação de demandas",
-                  "Relatórios avançados",
-                  "Suporte prioritário",
-                ],
-                highlight: true,
-              },
-              {
-                name: "Escritório",
-                price: "R$ 397",
-                desc: "Para equipes e escritórios maiores",
-                features: [
-                  "Contatos ilimitados",
-                  "Tudo do Profissional",
-                  "Multi-advogados",
-                  "API de integração",
-                  "Gerente de conta dedicado",
-                ],
-                highlight: false,
-              },
-            ].map((plan, i) => (
-              <motion.div key={plan.name} variants={fadeUp} custom={i}>
-                <Card
-                  className={`h-full relative ${
-                    plan.highlight
-                      ? "border-primary shadow-lg ring-1 ring-primary/20"
-                      : "border-border/50"
-                  }`}
-                >
-                  {plan.highlight && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
-                      Mais popular
-                    </span>
-                  )}
-                  <CardContent className="pt-8 pb-6 flex flex-col h-full">
-                    <h3 className="text-lg font-semibold">{plan.name}</h3>
-                    <p className="text-sm text-muted-foreground">{plan.desc}</p>
-                    <div className="mt-4 mb-6">
-                      <span className="text-4xl font-bold font-display">{plan.price}</span>
-                      <span className="text-muted-foreground">/mês</span>
-                    </div>
-                    <ul className="space-y-3 mb-8 flex-1">
-                      {plan.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-sm">
-                          <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                          <span className="text-foreground">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      className="w-full"
-                      variant={plan.highlight ? "default" : "outline"}
-                      onClick={goSignup}
-                    >
-                      Começar grátis
-                    </Button>
+              { label: "Agência de marketing", problem: "Gera mais leads, mas não resolve o vazamento no WhatsApp." },
+              { label: "Software / SaaS", problem: "Entrega a ferramenta, mas não opera. Você precisa fazer tudo." },
+              { label: "Consultoria", problem: "Fala o que fazer, mas não executa." },
+              { label: "Secretária humana", problem: "Cara, inconsistente e sem método replicável." },
+            ].map((item, i) => (
+              <motion.div key={item.label} variants={fadeUp} custom={i}>
+                <Card className="border-border/50">
+                  <CardContent className="pt-5 pb-4">
+                    <p className="font-semibold text-foreground">{item.label}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{item.problem}</p>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            custom={0}
+            className="mt-8 text-center"
+          >
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="py-6">
+                <p className="text-lg font-semibold text-foreground">
+                  A Holly faz algo diferente: <span className="text-primary">entra no WhatsApp, assume a operação e responde pelo fluxo.</span>
+                </p>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
       </section>
@@ -526,23 +616,27 @@ export default function LandingPage() {
           <div>
             <FAQItem
               question="Preciso instalar algo no celular?"
-              answer="Não. A Holly funciona via WhatsApp Web. Basta escanear o QR Code no nosso painel e pronto — a IA começa a monitorar automaticamente."
+              answer="Não. A Holly funciona via WhatsApp Web. Basta autorizar o acesso e pronto — os agentes começam a operar automaticamente."
             />
             <FAQItem
-              question="Meus clientes vão saber que uso a Holly?"
-              answer="Não. A Holly apenas lê as mensagens para análise. Ela não envia mensagens automáticas nem interage com seus contatos. Tudo acontece nos bastidores."
+              question="A Holly envia mensagens automáticas para meus contatos?"
+              answer="O Agente Secretária responde e faz triagem de novos contatos. O Agente de Recuperação retoma conversas esfriadas com mensagens naturais e personalizadas. Você mantém o controle total."
             />
             <FAQItem
-              question="O teste de 30 dias é realmente gratuito?"
-              answer="Sim! Você tem acesso ao plano Profissional completo por 30 dias, sem precisar cadastrar cartão de crédito. Ao final do período, escolha o plano ideal."
+              question="O que acontece se não funcionar em 30 dias?"
+              answer="Se o Protocolo não gerar conversas reais reativadas ao final dos 30 dias, a operação não continua. Simples assim. Sem discussão sobre 'resultado'."
             />
             <FAQItem
-              question="A Holly está em conformidade com a LGPD?"
-              answer="Sim. Todos os dados são criptografados, processados em servidores no Brasil e tratados de acordo com a Lei Geral de Proteção de Dados. Você mantém total controle sobre seus dados."
+              question="A Holly está em conformidade com a LGPD e a OAB?"
+              answer="Sim. Dados criptografados, consentimento explícito, processamento em servidores seguros e total conformidade com a LGPD e as normas da OAB. Você mantém controle total sobre seus dados."
             />
             <FAQItem
-              question="Posso cancelar a qualquer momento?"
-              answer="Sim. Não há fidelidade ou multa. Cancele quando quiser diretamente pelo painel, sem burocracia."
+              question="Qual a diferença entre a Holly e um software de CRM?"
+              answer="Software te entrega a ferramenta e você opera. A Holly entrega a operação pronta — entra no seu WhatsApp, assume o fluxo e recupera contatos que esfriaram. É serviço, não software."
+            />
+            <FAQItem
+              question="Como funciona a transição para Operação Contínua?"
+              answer="Ao final dos 30 dias de implementação, você decide se quer manter o Protocolo rodando de forma contínua. Sem pitch, sem pressão. O resultado fala por si."
             />
           </div>
         </div>
@@ -558,14 +652,15 @@ export default function LandingPage() {
             variants={stagger}
           >
             <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold font-display md:text-4xl">
-              Pronto para nunca mais perder um caso?
+              Seus leads estão esfriando agora.
             </motion.h2>
             <motion.p variants={fadeUp} custom={1} className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
-              Junte-se a mais de 2.400 advogados que já usam a Holly AI para reativar leads e aumentar conversões.
+              Implementamos o Protocolo de Dupla Atuação HOLLY™ para organizar o atendimento no WhatsApp jurídico
+              e recuperar contatos que esfriaram, em 30 dias com critério claro de continuidade.
             </motion.p>
             <motion.div variants={fadeUp} custom={2} className="mt-8">
               <Button size="lg" className="text-base px-10 h-12" onClick={goSignup}>
-                Iniciar teste grátis de 30 dias
+                Agendar uma conversa
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </motion.div>
@@ -586,8 +681,7 @@ export default function LandingPage() {
             © {new Date().getFullYear()} Holly AI. Todos os direitos reservados.
           </p>
           <div className="flex gap-6 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-foreground transition-colors">Termos</a>
-            <a href="#" className="hover:text-foreground transition-colors">Privacidade</a>
+            <a href="/privacidade" className="hover:text-foreground transition-colors">Privacidade</a>
             <a href="#" className="hover:text-foreground transition-colors">Contato</a>
           </div>
         </div>
