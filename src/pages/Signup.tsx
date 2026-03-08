@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Bot, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { signupSchema } from "@/lib/validations";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -17,21 +19,30 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast.error("A senha deve ter no mínimo 6 caracteres");
+    setErrors({});
+
+    const result = signupSchema.safeParse({ fullName, email, password, acceptTerms });
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        fieldErrors[issue.path[0] as string] = issue.message;
+      });
+      setErrors(fieldErrors);
       return;
     }
-    setLoading(true);
 
+    setLoading(true);
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: result.data.email,
+      password: result.data.password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: result.data.fullName },
         emailRedirectTo: window.location.origin,
       },
     });
@@ -110,9 +121,9 @@ export default function Signup() {
                     className="pl-9"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    required
                   />
                 </div>
+                {errors.fullName && <p className="text-xs text-destructive">{errors.fullName}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -125,9 +136,9 @@ export default function Signup() {
                     className="pl-9"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                   />
                 </div>
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Senha</Label>
@@ -136,12 +147,10 @@ export default function Signup() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder="Mínimo 8 caracteres"
                     className="pl-9 pr-9"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
                   />
                   <button
                     type="button"
@@ -151,7 +160,32 @@ export default function Signup() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+                <p className="text-[11px] text-muted-foreground">
+                  Mínimo 8 caracteres, com maiúscula, minúscula e número
+                </p>
               </div>
+
+              {/* LGPD Consent */}
+              <div className="space-y-2">
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptTerms}
+                    onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    Concordo com a{" "}
+                    <Link to="/privacidade" className="text-primary hover:underline">
+                      Política de Privacidade
+                    </Link>{" "}
+                    e autorizo o tratamento dos meus dados pessoais conforme a LGPD (Lei 13.709/2018).
+                  </label>
+                </div>
+                {errors.acceptTerms && <p className="text-xs text-destructive">{errors.acceptTerms}</p>}
+              </div>
+
               <Button
                 type="submit"
                 className="w-full holly-gradient border-0 text-primary-foreground hover:opacity-90"

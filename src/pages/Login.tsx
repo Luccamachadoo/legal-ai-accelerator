@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Bot, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { loginSchema } from "@/lib/validations";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,12 +18,27 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setErrors({});
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        fieldErrors[issue.path[0] as string] = issue.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: result.data.email,
+      password: result.data.password,
+    });
 
     if (error) {
       toast.error(error.message === "Invalid login credentials"
@@ -102,9 +118,9 @@ export default function Login() {
                     className="pl-9"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                   />
                 </div>
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -122,7 +138,6 @@ export default function Login() {
                     className="pl-9 pr-9"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required
                   />
                   <button
                     type="button"
@@ -132,6 +147,7 @@ export default function Login() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
               </div>
               <Button
                 type="submit"
