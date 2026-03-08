@@ -1,11 +1,14 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Outlet } from "react-router-dom";
-import { Bell } from "lucide-react";
+import { Bell, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useTheme } from "next-themes";
 
 export function DashboardLayout() {
+  const { theme, setTheme } = useTheme();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -15,7 +18,16 @@ export function DashboardLayout() {
             <div className="flex items-center gap-3">
               <SidebarTrigger />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Alternar tema"
+              >
+                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              </Button>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-4 w-4" />
                 <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] holly-gradient border-0 text-primary-foreground">
