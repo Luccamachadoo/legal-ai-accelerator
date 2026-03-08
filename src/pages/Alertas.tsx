@@ -1,25 +1,62 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Flame, Clock, MessageSquare, CheckCircle, Phone, Inbox } from "lucide-react";
+import { Flame, Clock, MessageSquare, CheckCircle, Phone, Inbox, Sparkles, Loader2, Copy } from "lucide-react";
 import { useAlertas, useMarkAlertaRead } from "@/hooks/useData";
+import { useGenerateRecoveryMessage } from "@/hooks/useAIRecuperacao";
+import { useSendChatwootMessage, useChatwootConfig } from "@/hooks/useChatwoot";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-
-const demandLabels: Record<string, string> = {
-  aposentadoria: "Aposentadoria",
-  inss: "INSS",
-  bpc_loas: "BPC/LOAS",
-  revisao: "Revisão",
-  outros: "Outros",
-};
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { demandLabels } from "@/lib/constants";
 
 export default function Alertas() {
   useEffect(() => { document.title = "Alertas — Holly AI"; }, []);
   const { data: alertas, isLoading } = useAlertas();
   const markRead = useMarkAlertaRead();
+  const generateRecovery = useGenerateRecoveryMessage();
+  const sendChatwoot = useSendChatwootMessage();
+  const { data: chatwootConfig } = useChatwootConfig();
+  const isChatwootEnabled = chatwootConfig?.enabled ?? false;
+
+  const [recoveryDialog, setRecoveryDialog] = useState<{
+    open: boolean;
+    contatoId: string;
+    contatoName: string;
+    message: string;
+  }>({ open: false, contatoId: "", contatoName: "", message: "" });
+
+  const handleGenerateRecovery = async (contatoId: string, contatoName: string) => {
+    const result = await generateRecovery.mutateAsync(contatoId);
+    setRecoveryDialog({
+      open: true,
+      contatoId,
+      contatoName,
+      message: result.message,
+    });
+  };
+
+  const handleSendRecovery = () => {
+    if (!isChatwootEnabled) {
+      navigator.clipboard.writeText(recoveryDialog.message);
+      toast.success("Mensagem copiada! Cole no WhatsApp.");
+      setRecoveryDialog((p) => ({ ...p, open: false }));
+      return;
+    }
+    sendChatwoot.mutate(
+      { contato_id: recoveryDialog.contatoId, content: recoveryDialog.message },
+      {
+        onSuccess: () => {
+          toast.success("Mensagem de recuperação enviada!");
+          setRecoveryDialog((p) => ({ ...p, open: false }));
+        },
+      }
+    );
+  };
 
   const unread = (alertas ?? []).filter((a) => !a.read).length;
 
@@ -107,6 +144,20 @@ export default function Alertas() {
                         <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
                         WhatsApp
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-primary/30 text-primary hover:bg-primary/5"
+                        onClick={() => handleGenerateRecovery(alerta.contato_id, alerta.contatos?.name ?? "Contato")}
+                        disabled={generateRecovery.isPending}
+                      >
+                        {generateRecovery.isPending ? (
+                          <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                        )}
+                        IA Recuperar
+                      </Button>
                       {!alerta.read && (
                         <Button
                           size="sm"
@@ -126,6 +177,55 @@ export default function Alertas() {
           ))}
         </div>
       )}
+
+      {/* Recovery Message Dialog */}
+      <Dialog open={recoveryDialog.open} onOpenChange={(open) => setRecoveryDialog((p) => ({ ...p, open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Mensagem de Recuperação
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Mensagem gerada por IA para <strong>{recoveryDialog.contatoName}</strong>:
+            </p>
+            <Textarea
+              rows={4}
+              value={recoveryDialog.message}
+              onChange={(e) => setRecoveryDialog((p) => ({ ...p, message: e.target.value }))}
+              className="text-sm"
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                navigator.clipboard.writeText(recoveryDialog.message);
+                toast.success("Copiada!");
+              }}
+            >
+              <Copy className="h-3.5 w-3.5 mr-1.5" />
+              Copiar
+            </Button>
+            <Button
+              size="sm"
+              className="holly-gradient border-0 text-primary-foreground"
+              onClick={handleSendRecovery}
+              disabled={sendChatwoot.isPending}
+            >
+              {sendChatwoot.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              {isChatwootEnabled ? "Enviar via Chatwoot" : "Copiar para WhatsApp"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
