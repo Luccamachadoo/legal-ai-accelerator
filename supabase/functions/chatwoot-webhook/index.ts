@@ -174,7 +174,132 @@ async function handleMessageCreated(
     .from("contatos")
     .update({ last_msg_at: new Date().toISOString() })
     .eq("id", contatoId);
-}
+
+  // For incoming messages, run AI classification
+  if (direction === "in") {
+    try {
+      // Get contato details
+      const { data: contatoData } = await supabase
+        .from("contatos")
+        .select("name, demand_type, score_hot")
+        .eq("id", contatoId)
+        .single();
+
+      // Get user config
+      const { data: userConfig } = await supabase
+        .from("configuracoes")
+        .select("*")
+        .eq("user_id", advogadoId)
+        .maybeSingle();
+
+      // Get Chatwoot config for auto-reply
+      const { data: cwConfig } = await supabase
+        .from("integracoes_chatwoot")
+        .select("*")
+        .eq("user_id", advogadoId)
+        .single();
+
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const aiRes = await fetch(`${supabaseUrl}/functions/v1/ai-secretaria`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contato_id: contatoId,
+          message_content: content,
+          contato_name: contatoData?.name,
+          demand_type: contatoData?.demand_type,
+          config: userConfig,
+        }),
+      });
+
+      if (aiRes.ok) {
+        const aiData = await aiRes.json();
+        const classification = aiData.classification;
+
+        // Update message ai_class
+        if (classification?.intent) {
+          // Update the last inserted message with classification
+          const { data: lastMsg } = await supabase
+            .from("mensagens")
+            .select("id")
+            .eq("contato_id", contatoId)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          if (lastMsg) {
+            await supabase
+              .from("mensagens")
+              .update({ ai_class: classification.intent })
+              .eq("id", lastMsg.id);
+          }
+        }
+
+        // Update contato score and demand_type
+        if (classification) {
+          const currentScore = contatoData?.score_hot ?? 0;
+          const newScore = Math.max(0, Math.min(1, currentScore + (classification.score_delta ?? 0)));
+          const updates: Record<string, unknown> = { score_hot: newScore };
+          if (classification.demand_type && classification.demand_type !== "outros") {
+            updates.demand_type = classification.demand_type;
+          }
+          // If score is high, mark as quente
+          if (newScore >= 0.6 && contatoData?.demand_type !== "fechado") {
+            updates.status = "quente";
+          }
+          await supabase.from("contatos").update(updates).eq("id", contatoId);
+
+          // Create alert if score is high
+          if (newScore >= 0.6 && classification.summary) {
+            await supabase.from("alertas").insert({
+              advogado_id: advogadoId,
+              contato_id: contatoId,
+              score: Math.round(newScore * 100),
+              summary: classification.summary,
+            });
+          }
+        }
+
+        // Send auto-reply via Chatwoot if available
+        if (aiData.auto_response && cwConfig) {
+          const baseUrl = cwConfig.chatwoot_base_url.replace(/\/$/, "");
+          const accountId = cwConfig.chatwoot_account_id;
+          const apiToken = cwConfig.chatwoot_api_token;
+
+          // Find conversation in Chatwoot
+          const convId = (msg.conversation as Record<string, unknown>)?.id;
+          if (convId) {
+            await fetch(
+              `${baseUrl}/api/v1/accounts/${accountId}/conversations/${convId}/messages`,
+              {
+                method: "POST",
+                headers: {
+                  api_access_token: apiToken,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  content: aiData.auto_response,
+                  message_type: "outgoing",
+                  private: false,
+                }),
+              }
+            );
+
+            // Save auto-reply locally
+            await supabase.from("mensagens").insert({
+              contato_id: contatoId,
+              content: aiData.auto_response,
+              direction: "out",
+              ai_class: "auto_reply",
+            });
+          }
+        }
+      }
+    } catch (aiErr) {
+      console.error("AI classification failed (non-blocking):", aiErr);
+      // Non-blocking: message is already saved even if AI fails
+    }
+  }
 
 async function handleContactEvent(
   supabase: ReturnType<typeof createClient>,
