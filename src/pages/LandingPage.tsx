@@ -67,7 +67,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const goSignup = () => navigate("/signup");
+  const goSignup = () => navigate("/agendar");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {

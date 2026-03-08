@@ -15,6 +15,7 @@ import Configuracoes from "@/pages/Configuracoes";
 import Perfil from "@/pages/Perfil";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
+import Agendar from "@/pages/Agendar";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import LandingPage from "@/pages/LandingPage";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/landing" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/agendar" element={<Agendar />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacidade" element={<Privacidade />} />
