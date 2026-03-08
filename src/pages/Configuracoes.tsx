@@ -11,6 +11,7 @@ import { Bot, Shield, Clock, Save, Loader2 } from "lucide-react";
 import { useConfiguracoes, useSaveConfiguracoes } from "@/hooks/useConfiguracoes";
 
 export default function Configuracoes() {
+  useEffect(() => { document.title = "Configurações — Holly AI"; }, []);
   const { data: config, isLoading } = useConfiguracoes();
   const saveConfig = useSaveConfiguracoes();
 

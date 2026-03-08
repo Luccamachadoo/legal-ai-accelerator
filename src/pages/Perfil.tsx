@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { profileSchema } from "@/lib/validations";
 
 export default function Perfil() {
+  useEffect(() => { document.title = "Meu Perfil — Holly AI"; }, []);
   const { user } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);

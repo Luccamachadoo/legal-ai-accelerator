@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ import { ptBR } from "date-fns/locale";
 import { demandLabels } from "@/lib/constants";
 
 export default function Mensagens() {
+  useEffect(() => { document.title = "Mensagens — Holly AI"; }, []);
   const [selectedContatoId, setSelectedContatoId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const { data: contatos, isLoading: contatosLoading } = useContatos();

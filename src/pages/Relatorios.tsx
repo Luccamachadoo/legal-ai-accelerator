@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { useRelatorios, useContatosStats } from "@/hooks/useData";
 import { toast } from "sonner";
 
 export default function Relatorios() {
+  useEffect(() => { document.title = "Relatórios — Holly AI"; }, []);
   const { data: relatorios, isLoading } = useRelatorios();
   const { data: stats } = useContatosStats();
 
