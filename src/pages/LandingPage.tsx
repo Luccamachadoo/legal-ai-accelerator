@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, type Easing } from "framer-motion";
 import {
@@ -63,6 +63,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 export default function LandingPage() {
   const navigate = useNavigate();
   const goSignup = () => navigate("/signup");
+
+  useEffect(() => {
+    document.title = "Holly AI — Reative leads e converta mais clientes | WhatsApp para Advogados";
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
