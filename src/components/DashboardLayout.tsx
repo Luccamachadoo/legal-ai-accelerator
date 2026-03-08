@@ -5,9 +5,15 @@ import { Bell, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTheme } from "next-themes";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function DashboardLayout() {
   const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
+
+  const initials = user?.user_metadata?.full_name
+    ? user.user_metadata.full_name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()
+    : user?.email?.slice(0, 2).toUpperCase() ?? "??";
 
   return (
     <SidebarProvider>
@@ -35,9 +41,17 @@ export function DashboardLayout() {
                 </Badge>
               </Button>
               <div className="flex items-center gap-2 ml-2">
-                <div className="h-8 w-8 rounded-full holly-gradient flex items-center justify-center text-xs font-semibold text-primary-foreground">
-                  JS
-                </div>
+                {user?.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt="Avatar"
+                    className="h-8 w-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full holly-gradient flex items-center justify-center text-xs font-semibold text-primary-foreground">
+                    {initials}
+                  </div>
+                )}
               </div>
             </div>
           </header>
