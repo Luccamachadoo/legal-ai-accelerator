@@ -20,3 +20,12 @@ verify_jwt = false
 
 [functions.report-cron]
 verify_jwt = false
+
+[functions.ai-assistant]
+verify_jwt = false
+
+[functions.ai-report]
+verify_jwt = false
+
+[functions.ai-score]
+verify_jwt = false
