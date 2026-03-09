@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      agendamentos: {
+        Row: {
+          advogado_id: string
+          contato_id: string
+          created_at: string
+          data_hora: string
+          id: string
+          link_reuniao: string | null
+          status: string | null
+        }
+        Insert: {
+          advogado_id: string
+          contato_id: string
+          created_at?: string
+          data_hora: string
+          id?: string
+          link_reuniao?: string | null
+          status?: string | null
+        }
+        Update: {
+          advogado_id?: string
+          contato_id?: string
+          created_at?: string
+          data_hora?: string
+          id?: string
+          link_reuniao?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agendamentos_contato_id_fkey"
+            columns: ["contato_id"]
+            isOneToOne: false
+            referencedRelation: "contatos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alertas: {
         Row: {
           advogado_id: string
@@ -145,6 +183,82 @@ export type Database = {
         }
         Relationships: []
       }
+      contratos: {
+        Row: {
+          advogado_id: string
+          contato_id: string
+          conteudo: string | null
+          created_at: string
+          file_url: string | null
+          id: string
+          status: string | null
+          titulo: string
+        }
+        Insert: {
+          advogado_id: string
+          contato_id: string
+          conteudo?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          status?: string | null
+          titulo: string
+        }
+        Update: {
+          advogado_id?: string
+          contato_id?: string
+          conteudo?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          status?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_contato_id_fkey"
+            columns: ["contato_id"]
+            isOneToOne: false
+            referencedRelation: "contatos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentos: {
+        Row: {
+          contato_id: string
+          created_at: string
+          dados_extraidos: Json | null
+          id: string
+          tipo: string
+          url: string | null
+        }
+        Insert: {
+          contato_id: string
+          created_at?: string
+          dados_extraidos?: Json | null
+          id?: string
+          tipo: string
+          url?: string | null
+        }
+        Update: {
+          contato_id?: string
+          created_at?: string
+          dados_extraidos?: Json | null
+          id?: string
+          tipo?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_contato_id_fkey"
+            columns: ["contato_id"]
+            isOneToOne: false
+            referencedRelation: "contatos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       integracoes_chatwoot: {
         Row: {
           chatwoot_account_id: string
@@ -181,6 +295,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
           webhook_secret?: string
+        }
+        Relationships: []
+      }
+      kb_documents: {
+        Row: {
+          advogado_id: string
+          content: string | null
+          created_at: string
+          file_url: string | null
+          id: string
+          titulo: string
+        }
+        Insert: {
+          advogado_id: string
+          content?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          titulo: string
+        }
+        Update: {
+          advogado_id?: string
+          content?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          titulo?: string
         }
         Relationships: []
       }

@@ -9,6 +9,9 @@ import {
   LogOut,
   UserCircle,
   Sparkles,
+  CalendarDays,
+  FileSignature,
+  BrainCircuit,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -33,11 +36,14 @@ const mainNav = [
   { title: "Assistente AI", url: "/assistente", icon: Sparkles },
   { title: "Contatos", url: "/contatos", icon: Users },
   { title: "Mensagens", url: "/mensagens", icon: MessageSquare },
+  { title: "Agendamentos", url: "/agendamentos", icon: CalendarDays },
+  { title: "Contratos", url: "/contratos", icon: FileSignature },
   { title: "Alertas", url: "/alertas", icon: Bell },
 ];
 
 const secondaryNav = [
   { title: "Relatórios", url: "/relatorios", icon: FileText },
+  { title: "Base de Conhecimento", url: "/base-conhecimento", icon: BrainCircuit },
   { title: "Meu Perfil", url: "/perfil", icon: UserCircle },
   { title: "Configurações", url: "/configuracoes", icon: Settings },
 ];
