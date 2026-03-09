@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3-flash-preview";
+const MODEL = "openai/gpt-5-nano";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
