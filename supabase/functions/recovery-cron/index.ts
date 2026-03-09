@@ -13,12 +13,12 @@ Deno.serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
-    // Verify cron authentication - usually requires service role key or specific auth
+    // Verify cron authentication
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader || authHeader !== `Bearer ${supabaseServiceKey}`) {
+    if (!authHeader || authHeader !== `Bearer ${supabaseAnonKey}`) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
