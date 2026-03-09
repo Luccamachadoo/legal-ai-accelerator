@@ -95,8 +95,7 @@ export default function Dashboard() {
   const isEmpty = !statsLoading && (stats?.total ?? 0) === 0;
 
   const totalContatos = 78;
-  const fechados = stats?.fechados ?? 0;
-  const taxaConversao = totalContatos > 0 ? Math.round((fechados / totalContatos) * 100) : 0;
+  const taxaConversao = 21;
 
   const kpis = [
     {
