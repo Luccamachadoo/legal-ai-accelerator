@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
 
     // Verify cron authentication
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader || authHeader !== `Bearer ${supabaseAnonKey}`) {
+    if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 

@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader || authHeader !== `Bearer ${supabaseAnonKey}`) {
+    if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
