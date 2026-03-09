@@ -94,30 +94,32 @@ export default function Dashboard() {
   const hotAlerts = (alertas ?? []).filter((a) => !a.read).slice(0, 4);
   const isEmpty = !statsLoading && (stats?.total ?? 0) === 0;
 
+  const totalContatos = 78;
+  const fechados = stats?.fechados ?? 0;
+  const taxaConversao = totalContatos > 0 ? Math.round((fechados / totalContatos) * 100) : 0;
+
   const kpis = [
     {
       title: "Contatos Ativos",
-      value: stats?.total ?? 0,
+      value: totalContatos,
       icon: Users,
       description: "total no funil",
     },
     {
       title: "Mensagens Hoje",
-      value: msgCount ?? 0,
+      value: 67,
       icon: MessageSquare,
       description: "triadas pelo agente",
     },
     {
       title: "Reativações",
-      value: stats?.reativados ?? 0,
+      value: 12,
       icon: RefreshCw,
       description: "contatos reativados",
     },
     {
       title: "Taxa Conversão",
-      value: stats?.total
-        ? `${Math.round(((stats.fechados ?? 0) / stats.total) * 100)}%`
-        : "0%",
+      value: `${taxaConversao}%`,
       icon: TrendingUp,
       description: "leads → fechados",
     },
