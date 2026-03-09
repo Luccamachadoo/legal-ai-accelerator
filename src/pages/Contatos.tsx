@@ -10,9 +10,10 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, Download, Inbox, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, Download, Inbox, ChevronLeft, ChevronRight, Wand2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useContatos } from "@/hooks/useData";
+import { useCalculateScore } from "@/hooks/useAIScore";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { demandLabels, statusConfig, PAGE_SIZE } from "@/lib/constants";
@@ -24,6 +25,21 @@ export default function Contatos() {
   const [statusFilter, setStatusFilter] = useState("todos");
   const [page, setPage] = useState(0);
   const { data: contatos, isLoading } = useContatos(statusFilter);
+  const calculateScore = useCalculateScore();
+  const [scoringId, setScoringId] = useState<string | null>(null);
+
+  const handlePredictScore = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setScoringId(id);
+    try {
+      await calculateScore.mutateAsync(id);
+      toast.success("Score recalculado com IA!");
+    } catch (err) {
+      // erro tratado no hook
+    } finally {
+      setScoringId(null);
+    }
+  };
 
   const filtered = (contatos ?? []).filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -155,17 +171,33 @@ export default function Contatos() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <span
-                          className={`font-semibold text-sm ${
-                            contato.score_hot >= 0.8
-                              ? "text-primary"
-                              : contato.score_hot >= 0.5
-                              ? "text-holly-warning"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {Math.round(contato.score_hot * 100)}%
-                        </span>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-primary"
+                            onClick={(e) => handlePredictScore(e, contato.id)}
+                            disabled={scoringId === contato.id}
+                            title="Recalcular Score com IA"
+                          >
+                            {scoringId === contato.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <Wand2 className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                          <span
+                            className={`font-semibold text-sm w-8 ${
+                              contato.score_hot >= 0.8
+                                ? "text-primary"
+                                : contato.score_hot >= 0.5
+                                ? "text-holly-warning"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            {Math.round(contato.score_hot * 100)}%
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-right text-sm text-muted-foreground">
                         {contato.last_msg_at
