@@ -300,6 +300,7 @@ async function handleMessageCreated(
       // Non-blocking: message is already saved even if AI fails
     }
   }
+}
 
 async function handleContactEvent(
   supabase: ReturnType<typeof createClient>,
