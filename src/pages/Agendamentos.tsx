@@ -1,15 +1,145 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { CalendarDays, Plus, Trash2, ExternalLink, Clock } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function Agendamentos() {
   useEffect(() => { document.title = "Agendamentos — Holly AI"; }, []);
+
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [dataHora, setDataHora] = useState("");
+  const [contatoId, setContatoId] = useState("");
+  const [linkReuniao, setLinkReuniao] = useState("");
+
+  const { data: agendamentos, isLoading } = useQuery({
+    queryKey: ["agendamentos", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("agendamentos")
+        .select("*, contatos(name, phone)")
+        .order("data_hora", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: contatos } = useQuery({
+    queryKey: ["contatos-list", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("contatos").select("id, name, phone");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("agendamentos").insert({
+        advogado_id: user!.id,
+        contato_id: contatoId,
+        data_hora: new Date(dataHora).toISOString(),
+        link_reuniao: linkReuniao || null,
+        status: "agendado",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agendamentos"] });
+      toast.success("Agendamento criado com sucesso!");
+      setOpen(false);
+      setDataHora("");
+      setContatoId("");
+      setLinkReuniao("");
+    },
+    onError: () => toast.error("Erro ao criar agendamento"),
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("agendamentos").update({ status }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agendamentos"] });
+      toast.success("Status atualizado!");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("agendamentos").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agendamentos"] });
+      toast.success("Agendamento removido!");
+    },
+  });
+
+  const statusColor = (s: string | null) => {
+    switch (s) {
+      case "agendado": return "default";
+      case "confirmado": return "secondary";
+      case "realizado": return "outline";
+      case "cancelado": return "destructive";
+      default: return "default";
+    }
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight font-display">Agendamentos</h2>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button><Plus className="h-4 w-4 mr-2" />Novo Agendamento</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Novo Agendamento</DialogTitle></DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div>
+                <Label>Contato</Label>
+                <Select value={contatoId} onValueChange={setContatoId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione o contato" /></SelectTrigger>
+                  <SelectContent>
+                    {contatos?.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.name || c.phone}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Data e Hora</Label>
+                <Input type="datetime-local" value={dataHora} onChange={(e) => setDataHora(e.target.value)} />
+              </div>
+              <div>
+                <Label>Link da Reunião (opcional)</Label>
+                <Input placeholder="https://meet.google.com/..." value={linkReuniao} onChange={(e) => setLinkReuniao(e.target.value)} />
+              </div>
+              <Button className="w-full" onClick={() => createMutation.mutate()} disabled={!contatoId || !dataHora || createMutation.isPending}>
+                {createMutation.isPending ? "Criando..." : "Criar Agendamento"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
+
       <Card className="holly-card-shadow border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -18,7 +148,60 @@ export default function Agendamentos() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Aqui você gerencia as consultas agendadas automaticamente pela inteligência artificial.</p>
+          {isLoading ? (
+            <p className="text-muted-foreground">Carregando...</p>
+          ) : !agendamentos?.length ? (
+            <p className="text-muted-foreground">Nenhum agendamento encontrado. Crie o primeiro!</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Data/Hora</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Link</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {agendamentos.map((a: any) => (
+                  <TableRow key={a.id}>
+                    <TableCell className="font-medium">{a.contatos?.name || "—"}</TableCell>
+                    <TableCell>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                        {format(new Date(a.data_hora), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                      </span>
+                    </TableCell>
+                    <TableCell><Badge variant={statusColor(a.status)}>{a.status ?? "agendado"}</Badge></TableCell>
+                    <TableCell>
+                      {a.link_reuniao ? (
+                        <a href={a.link_reuniao} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
+                          <ExternalLink className="h-3.5 w-3.5" /> Abrir
+                        </a>
+                      ) : "—"}
+                    </TableCell>
+                    <TableCell className="text-right space-x-1">
+                      <Select onValueChange={(v) => updateStatusMutation.mutate({ id: a.id, status: v })}>
+                        <SelectTrigger className="w-[130px] h-8 text-xs inline-flex">
+                          <SelectValue placeholder="Alterar status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="agendado">Agendado</SelectItem>
+                          <SelectItem value="confirmado">Confirmado</SelectItem>
+                          <SelectItem value="realizado">Realizado</SelectItem>
+                          <SelectItem value="cancelado">Cancelado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteMutation.mutate(a.id)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
