@@ -163,7 +163,7 @@ export default function Dashboard() {
       <motion.div variants={item} className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2 holly-card-shadow border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Distribuição por Status</CardTitle>
+            <CardTitle className="text-base font-semibold">Funil de Conversão Interativo</CardTitle>
           </CardHeader>
           <CardContent>
             {statsLoading ? (
@@ -175,23 +175,29 @@ export default function Dashboard() {
                 <p className="text-xs">Os dados aparecerão aqui quando o protocolo começar a operar</p>
               </div>
             ) : (
-              <div className="space-y-3 py-4">
+              <div className="space-y-4 py-4">
                 {[
-                  { label: "Novos", value: (stats?.contatos ?? []).filter((c) => c.status === "novo").length, color: "bg-holly-info" },
-                  { label: "Quentes", value: stats?.quentes ?? 0, color: "bg-primary" },
-                  { label: "Esfriados", value: stats?.esfriados ?? 0, color: "bg-muted-foreground" },
-                  { label: "Reativados", value: stats?.reativados ?? 0, color: "bg-holly-success" },
-                  { label: "Fechados", value: stats?.fechados ?? 0, color: "bg-foreground" },
+                  { label: "Novos", value: (stats?.contatos ?? []).filter((c) => c.status === "novo").length, color: "bg-holly-info", desc: "Leads que acabaram de chegar" },
+                  { label: "Quentes", value: stats?.quentes ?? 0, color: "bg-primary", desc: "Alto score, prontos para ação" },
+                  { label: "Esfriados", value: stats?.esfriados ?? 0, color: "bg-muted-foreground", desc: "Aguardando recuperação automática" },
+                  { label: "Reativados", value: stats?.reativados ?? 0, color: "bg-holly-success", desc: "Recuperados pela IA, atenção!" },
+                  { label: "Fechados", value: stats?.fechados ?? 0, color: "bg-foreground", desc: "Contratos assinados" },
                 ].map((s) => (
-                  <div key={s.label} className="flex items-center gap-3">
-                    <span className="text-sm w-24 text-muted-foreground">{s.label}</span>
-                    <div className="flex-1 h-6 bg-muted rounded-md overflow-hidden">
+                  <div key={s.label} className="group relative flex items-center gap-4 cursor-default">
+                    <div className="w-28 text-right">
+                      <span className="text-sm font-medium text-foreground">{s.label}</span>
+                      <p className="text-[10px] text-muted-foreground">{s.desc}</p>
+                    </div>
+                    <div className="flex-1 h-8 bg-muted rounded-md overflow-hidden relative">
                       <div
-                        className={`h-full ${s.color} rounded-md transition-all`}
+                        className={`h-full ${s.color} rounded-md transition-all duration-1000 ease-out group-hover:brightness-110`}
                         style={{ width: `${stats?.total ? (s.value / stats.total) * 100 : 0}%` }}
                       />
+                      <div className="absolute inset-y-0 left-3 flex items-center">
+                        <span className="text-xs font-bold text-white drop-shadow-md">{stats?.total ? Math.round((s.value / stats.total) * 100) : 0}%</span>
+                      </div>
                     </div>
-                    <span className="text-sm font-semibold w-8 text-right">{s.value}</span>
+                    <span className="text-sm font-bold w-12 text-right">{s.value}</span>
                   </div>
                 ))}
               </div>
