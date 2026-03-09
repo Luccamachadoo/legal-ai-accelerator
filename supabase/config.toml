@@ -11,3 +11,12 @@ verify_jwt = false
 
 [functions.ai-recuperacao]
 verify_jwt = false
+
+[functions.recovery-cron]
+verify_jwt = false
+
+[functions.lgpd-cron]
+verify_jwt = false
+
+[functions.report-cron]
+verify_jwt = false
