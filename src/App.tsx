@@ -22,6 +22,9 @@ import ResetPassword from "@/pages/ResetPassword";
 import LandingPage from "@/pages/LandingPage";
 import Privacidade from "@/pages/Privacidade";
 import NotFound from "./pages/NotFound";
+import Agendamentos from "@/pages/Agendamentos";
+import Contratos from "@/pages/Contratos";
+import BaseConhecimento from "@/pages/BaseConhecimento";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +68,9 @@ const App = () => (
               <Route path="/contatos" element={<Contatos />} />
               <Route path="/mensagens" element={<Mensagens />} />
               <Route path="/alertas" element={<Alertas />} />
+              <Route path="/agendamentos" element={<Agendamentos />} />
+              <Route path="/contratos" element={<Contratos />} />
+              <Route path="/base-conhecimento" element={<BaseConhecimento />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/configuracoes" element={<Configuracoes />} />
               <Route path="/perfil" element={<Perfil />} />
