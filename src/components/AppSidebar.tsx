@@ -8,6 +8,7 @@ import {
   Bot,
   LogOut,
   UserCircle,
+  Sparkles,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ import {
 
 const mainNav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Assistente AI", url: "/assistente", icon: Sparkles },
   { title: "Contatos", url: "/contatos", icon: Users },
   { title: "Mensagens", url: "/mensagens", icon: MessageSquare },
   { title: "Alertas", url: "/alertas", icon: Bell },
