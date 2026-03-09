@@ -133,6 +133,34 @@ export default function Relatorios() {
         ))}
       </div>
 
+      {/* AI Smart Report */}
+      <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }} initial="hidden" animate="show">
+        <Card className="holly-card-shadow border-primary/20">
+          <CardHeader className="pb-3 border-b border-border/50 bg-primary/5">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Análise Inteligente da Semana</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {aiLoading ? (
+              <div className="flex items-center justify-center py-8 text-muted-foreground gap-2">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span>Gerando relatório inteligente...</span>
+              </div>
+            ) : (
+              <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-semibold prose-a:text-primary">
+                {aiReport ? (
+                  <ReactMarkdown>{aiReport}</ReactMarkdown>
+                ) : (
+                  <p>Não foi possível gerar a análise inteligente no momento.</p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Relatórios salvos */}
       <Card className="holly-card-shadow border-border/50">
         <CardHeader>
