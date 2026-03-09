@@ -3,14 +3,17 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Calendar, TrendingUp, Users, RefreshCw, AlertTriangle, Inbox } from "lucide-react";
+import { Download, Calendar, TrendingUp, Users, RefreshCw, AlertTriangle, Inbox, Sparkles, Loader2 } from "lucide-react";
 import { useRelatorios, useContatosStats } from "@/hooks/useData";
+import { useAIReport } from "@/hooks/useAIReport";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
 export default function Relatorios() {
   useEffect(() => { document.title = "Relatórios — Holly AI"; }, []);
   const { data: relatorios, isLoading } = useRelatorios();
   const { data: stats } = useContatosStats();
+  const { data: aiReport, isLoading: aiLoading } = useAIReport();
 
   const total = stats?.total ?? 0;
   const reativados = stats?.reativados ?? 0;
