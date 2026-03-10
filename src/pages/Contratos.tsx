@@ -105,6 +105,17 @@ export default function Contratos() {
     }
   };
 
+  const filteredContratos = useMemo(() => {
+    if (!contratos) return [];
+    return contratos.filter((c: any) => {
+      const matchesSearch = !searchTerm ||
+        c.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.contatos?.name || "").toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "todos" || c.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [contratos, searchTerm, statusFilter]);
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -157,6 +168,29 @@ export default function Contratos() {
           )}
         </DialogContent>
       </Dialog>
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por título ou contato..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filtrar status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os status</SelectItem>
+            <SelectItem value="gerado">Gerado</SelectItem>
+            <SelectItem value="enviado">Enviado</SelectItem>
+            <SelectItem value="assinado">Assinado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <Card className="holly-card-shadow border-border/50">
         <CardHeader>
