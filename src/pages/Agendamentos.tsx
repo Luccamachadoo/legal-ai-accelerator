@@ -24,6 +24,8 @@ export default function Agendamentos() {
   const [dataHora, setDataHora] = useState("");
   const [contatoId, setContatoId] = useState("");
   const [linkReuniao, setLinkReuniao] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
 
   const { data: agendamentos, isLoading } = useQuery({
     queryKey: ["agendamentos", user?.id],

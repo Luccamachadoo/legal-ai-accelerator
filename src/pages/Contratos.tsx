@@ -26,6 +26,8 @@ export default function Contratos() {
   const [titulo, setTitulo] = useState("");
   const [conteudo, setConteudo] = useState("");
   const [contatoId, setContatoId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
 
   const { data: contratos, isLoading } = useQuery({
     queryKey: ["contratos", user?.id],
