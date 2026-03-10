@@ -218,7 +218,7 @@ export default function Contratos() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {contratos.map((c: any) => (
+                {filteredContratos.map((c: any) => (
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.titulo}</TableCell>
                     <TableCell>{c.contatos?.name || "—"}</TableCell>
