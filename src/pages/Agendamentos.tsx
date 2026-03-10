@@ -186,8 +186,10 @@ export default function Agendamentos() {
         <CardContent>
           {isLoading ? (
             <p className="text-muted-foreground">Carregando...</p>
-          ) : !agendamentos?.length ? (
-            <p className="text-muted-foreground">Nenhum agendamento encontrado. Crie o primeiro!</p>
+          ) : !filteredAgendamentos.length ? (
+            <p className="text-muted-foreground">
+              {agendamentos?.length ? "Nenhum agendamento encontrado com os filtros aplicados." : "Nenhum agendamento encontrado. Crie o primeiro!"}
+            </p>
           ) : (
             <Table>
               <TableHeader>
