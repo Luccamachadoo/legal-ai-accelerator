@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Plus, Trash2, ExternalLink, Clock } from "lucide-react";
+import { CalendarDays, Plus, Trash2, ExternalLink, Clock, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -24,6 +24,8 @@ export default function Agendamentos() {
   const [dataHora, setDataHora] = useState("");
   const [contatoId, setContatoId] = useState("");
   const [linkReuniao, setLinkReuniao] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
 
   const { data: agendamentos, isLoading } = useQuery({
     queryKey: ["agendamentos", user?.id],
@@ -102,6 +104,16 @@ export default function Agendamentos() {
     }
   };
 
+  const filteredAgendamentos = useMemo(() => {
+    if (!agendamentos) return [];
+    return agendamentos.filter((a: any) => {
+      const matchesSearch = !searchTerm || 
+        (a.contatos?.name || "").toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "todos" || a.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [agendamentos, searchTerm, statusFilter]);
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -140,6 +152,30 @@ export default function Agendamentos() {
         </Dialog>
       </div>
 
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome do contato..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filtrar status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os status</SelectItem>
+            <SelectItem value="agendado">Agendado</SelectItem>
+            <SelectItem value="confirmado">Confirmado</SelectItem>
+            <SelectItem value="realizado">Realizado</SelectItem>
+            <SelectItem value="cancelado">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <Card className="holly-card-shadow border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -150,8 +186,10 @@ export default function Agendamentos() {
         <CardContent>
           {isLoading ? (
             <p className="text-muted-foreground">Carregando...</p>
-          ) : !agendamentos?.length ? (
-            <p className="text-muted-foreground">Nenhum agendamento encontrado. Crie o primeiro!</p>
+          ) : !filteredAgendamentos.length ? (
+            <p className="text-muted-foreground">
+              {agendamentos?.length ? "Nenhum agendamento encontrado com os filtros aplicados." : "Nenhum agendamento encontrado. Crie o primeiro!"}
+            </p>
           ) : (
             <Table>
               <TableHeader>
@@ -164,7 +202,7 @@ export default function Agendamentos() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {agendamentos.map((a: any) => (
+                {filteredAgendamentos.map((a: any) => (
                   <TableRow key={a.id}>
                     <TableCell className="font-medium">{a.contatos?.name || "—"}</TableCell>
                     <TableCell>

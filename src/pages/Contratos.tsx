@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { FileSignature, Plus, Trash2, Eye, Download } from "lucide-react";
+import { FileSignature, Plus, Trash2, Eye, Download, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,6 +26,8 @@ export default function Contratos() {
   const [titulo, setTitulo] = useState("");
   const [conteudo, setConteudo] = useState("");
   const [contatoId, setContatoId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
 
   const { data: contratos, isLoading } = useQuery({
     queryKey: ["contratos", user?.id],
@@ -103,6 +105,17 @@ export default function Contratos() {
     }
   };
 
+  const filteredContratos = useMemo(() => {
+    if (!contratos) return [];
+    return contratos.filter((c: any) => {
+      const matchesSearch = !searchTerm ||
+        c.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.contatos?.name || "").toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "todos" || c.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [contratos, searchTerm, statusFilter]);
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -156,6 +169,29 @@ export default function Contratos() {
         </DialogContent>
       </Dialog>
 
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por título ou contato..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filtrar status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os status</SelectItem>
+            <SelectItem value="gerado">Gerado</SelectItem>
+            <SelectItem value="enviado">Enviado</SelectItem>
+            <SelectItem value="assinado">Assinado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <Card className="holly-card-shadow border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -166,8 +202,10 @@ export default function Contratos() {
         <CardContent>
           {isLoading ? (
             <p className="text-muted-foreground">Carregando...</p>
-          ) : !contratos?.length ? (
-            <p className="text-muted-foreground">Nenhum contrato encontrado. Crie o primeiro!</p>
+          ) : !filteredContratos.length ? (
+            <p className="text-muted-foreground">
+              {contratos?.length ? "Nenhum contrato encontrado com os filtros aplicados." : "Nenhum contrato encontrado. Crie o primeiro!"}
+            </p>
           ) : (
             <Table>
               <TableHeader>
@@ -180,7 +218,7 @@ export default function Contratos() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {contratos.map((c: any) => (
+                {filteredContratos.map((c: any) => (
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.titulo}</TableCell>
                     <TableCell>{c.contatos?.name || "—"}</TableCell>
