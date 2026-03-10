@@ -104,6 +104,16 @@ export default function Agendamentos() {
     }
   };
 
+  const filteredAgendamentos = useMemo(() => {
+    if (!agendamentos) return [];
+    return agendamentos.filter((a: any) => {
+      const matchesSearch = !searchTerm || 
+        (a.contatos?.name || "").toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "todos" || a.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [agendamentos, searchTerm, statusFilter]);
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -140,6 +150,30 @@ export default function Agendamentos() {
             </div>
           </DialogContent>
         </Dialog>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome do contato..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filtrar status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os status</SelectItem>
+            <SelectItem value="agendado">Agendado</SelectItem>
+            <SelectItem value="confirmado">Confirmado</SelectItem>
+            <SelectItem value="realizado">Realizado</SelectItem>
+            <SelectItem value="cancelado">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Card className="holly-card-shadow border-border/50">
