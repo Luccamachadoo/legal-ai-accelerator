@@ -202,7 +202,7 @@ export default function Agendamentos() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {agendamentos.map((a: any) => (
+                {filteredAgendamentos.map((a: any) => (
                   <TableRow key={a.id}>
                     <TableCell className="font-medium">{a.contatos?.name || "—"}</TableCell>
                     <TableCell>
