@@ -25,6 +25,9 @@ import {
   Bar,
 } from "recharts";
 import { useContatosStats, useMensagensCount, useAlertas } from "@/hooks/useData";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
