@@ -190,6 +190,7 @@ export default function Dashboard() {
       {/* Onboarding — hides itself when all steps are done */}
       <motion.div variants={item}>
         <OnboardingCard />
+      </motion.div>
 
       {/* Stats */}
       <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
