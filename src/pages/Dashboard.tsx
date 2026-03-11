@@ -187,12 +187,9 @@ export default function Dashboard() {
         </p>
       </motion.div>
 
-      {/* Onboarding when empty */}
-      {isEmpty && (
-        <motion.div variants={item}>
-          <OnboardingCard />
-        </motion.div>
-      )}
+      {/* Onboarding — hides itself when all steps are done */}
+      <motion.div variants={item}>
+        <OnboardingCard />
 
       {/* Stats */}
       <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
