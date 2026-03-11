@@ -94,8 +94,10 @@ export default function Dashboard() {
   const hotAlerts = (alertas ?? []).filter((a) => !a.read).slice(0, 4);
   const isEmpty = !statsLoading && (stats?.total ?? 0) === 0;
 
-  const totalContatos = 78;
-  const taxaConversao = 21;
+  const totalContatos = stats?.total ?? 0;
+  const totalReativados = stats?.reativados ?? 0;
+  const totalFechados = stats?.fechados ?? 0;
+  const taxaConversao = totalContatos > 0 ? Math.round((totalFechados / totalContatos) * 100) : 0;
 
   const kpis = [
     {
@@ -106,13 +108,13 @@ export default function Dashboard() {
     },
     {
       title: "Mensagens Hoje",
-      value: 67,
+      value: msgCount ?? 0,
       icon: MessageSquare,
       description: "triadas pelo agente",
     },
     {
       title: "Reativações",
-      value: 12,
+      value: totalReativados,
       icon: RefreshCw,
       description: "contatos reativados",
     },
