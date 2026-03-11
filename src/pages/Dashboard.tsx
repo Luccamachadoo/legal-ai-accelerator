@@ -25,6 +25,9 @@ import {
   Bar,
 } from "recharts";
 import { useContatosStats, useMensagensCount, useAlertas } from "@/hooks/useData";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
@@ -44,12 +47,47 @@ import { demandLabels } from "@/lib/constants";
 
 function OnboardingCard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile-onboarding", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("full_name, oab, whatsapp_phone").eq("user_id", user!.id).maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: config } = useQuery({
+    queryKey: ["config-onboarding", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("configuracoes").select("id").eq("user_id", user!.id).maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: chatwoot } = useQuery({
+    queryKey: ["chatwoot-onboarding", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("integracoes_chatwoot").select("enabled").eq("user_id", user!.id).maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const profileDone = !!(profile?.full_name && profile?.oab);
+  const configDone = !!config?.id;
+  const whatsappDone = !!chatwoot?.enabled;
 
   const steps = [
-    { label: "Configure seu perfil", href: "/perfil", icon: Users, done: false },
-    { label: "Ajuste os agentes", href: "/configuracoes", icon: Settings, done: false },
-    { label: "Conecte seu WhatsApp", href: "#", icon: Phone, done: false },
+    { label: "Configure seu perfil", href: "/perfil", icon: Users, done: profileDone },
+    { label: "Ajuste os agentes", href: "/configuracoes", icon: Settings, done: configDone },
+    { label: "Conecte seu WhatsApp", href: "/configuracoes", icon: Phone, done: whatsappDone },
   ];
+
+  const allDone = steps.every((s) => s.done);
+  if (allDone) return null;
 
   return (
     <Card className="holly-card-shadow border-primary/20 bg-primary/5">
@@ -69,14 +107,26 @@ function OnboardingCard() {
           {steps.map((step, i) => (
             <button
               key={i}
-              onClick={() => step.href !== "#" && navigate(step.href)}
-              className="w-full flex items-center gap-3 p-3 rounded-lg bg-background border border-border/50 hover:border-primary/30 transition-colors text-left"
+              onClick={() => navigate(step.href)}
+              className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                step.done
+                  ? "bg-primary/5 border-primary/20 opacity-70"
+                  : "bg-background border-border/50 hover:border-primary/30"
+              }`}
             >
-              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                <step.icon className="h-4 w-4 text-muted-foreground" />
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+                step.done ? "bg-primary/20" : "bg-muted"
+              }`}>
+                {step.done ? (
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                ) : (
+                  <step.icon className="h-4 w-4 text-muted-foreground" />
+                )}
               </div>
-              <span className="text-sm font-medium text-foreground">{step.label}</span>
-              <span className="ml-auto text-xs text-muted-foreground">Pendente</span>
+              <span className={`text-sm font-medium ${step.done ? "line-through text-muted-foreground" : "text-foreground"}`}>{step.label}</span>
+              <span className={`ml-auto text-xs ${step.done ? "text-primary" : "text-muted-foreground"}`}>
+                {step.done ? "Concluído" : "Pendente"}
+              </span>
             </button>
           ))}
         </div>
@@ -137,12 +187,10 @@ export default function Dashboard() {
         </p>
       </motion.div>
 
-      {/* Onboarding when empty */}
-      {isEmpty && (
-        <motion.div variants={item}>
-          <OnboardingCard />
-        </motion.div>
-      )}
+      {/* Onboarding — hides itself when all steps are done */}
+      <motion.div variants={item}>
+        <OnboardingCard />
+      </motion.div>
 
       {/* Stats */}
       <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
