@@ -11,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Search, Filter, Download, Inbox, ChevronLeft, ChevronRight, Wand2, Loader2 } from "lucide-react";
+import { TableSkeletonRows } from "@/components/TableSkeleton";
 import { useState } from "react";
 import { useContatos } from "@/hooks/useData";
 import { useCalculateScore } from "@/hooks/useAIScore";
