@@ -159,6 +159,8 @@ export default function Contatos() {
             </div>
           ) : (
             <>
+              {/* Desktop table */}
+              <div className="hidden md:block">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -219,6 +221,59 @@ export default function Contatos() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="md:hidden divide-y divide-border/50">
+                {paginated.map((contato) => (
+                  <div key={contato.id} className="p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">{contato.name || "Sem nome"}</span>
+                      <Badge variant="outline" className={statusConfig[contato.status].className}>
+                        {statusConfig[contato.status].label}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{maskPhone(contato.phone)}</span>
+                      <span>{demandLabels[contato.demand_type ?? ""] ?? "—"}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        {contato.last_msg_at
+                          ? formatDistanceToNow(new Date(contato.last_msg_at), { addSuffix: true, locale: ptBR })
+                          : "—"}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-primary"
+                          onClick={(e) => handlePredictScore(e, contato.id)}
+                          disabled={scoringId === contato.id}
+                          title="Recalcular Score com IA"
+                        >
+                          {scoringId === contato.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Wand2 className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+                        <span
+                          className={`font-semibold text-sm ${
+                            contato.score_hot >= 0.8
+                              ? "text-primary"
+                              : contato.score_hot >= 0.5
+                              ? "text-holly-warning"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {Math.round(contato.score_hot * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
