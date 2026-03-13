@@ -220,29 +220,82 @@ export default function Contratos() {
               {contratos?.length ? "Nenhum contrato encontrado com os filtros aplicados." : "Nenhum contrato encontrado. Crie o primeiro!"}
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop table */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Título</TableHead>
+                      <TableHead>Contato</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredContratos.map((c: any) => (
+                      <TableRow key={c.id}>
+                        <TableCell className="font-medium">{c.titulo}</TableCell>
+                        <TableCell>{c.contatos?.name || "—"}</TableCell>
+                        <TableCell>{format(new Date(c.created_at), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
+                        <TableCell><Badge variant={statusColor(c.status)}>{c.status ?? "gerado"}</Badge></TableCell>
+                        <TableCell className="text-right space-x-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setViewContrato(c)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Select onValueChange={(v) => updateStatusMutation.mutate({ id: c.id, status: v })}>
+                            <SelectTrigger className="w-[120px] h-8 text-xs inline-flex">
+                              <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="gerado">Gerado</SelectItem>
+                              <SelectItem value="enviado">Enviado</SelectItem>
+                              <SelectItem value="assinado">Assinado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Excluir contrato?</AlertDialogTitle>
+                                <AlertDialogDescription>Esta ação não pode ser desfeita. O contrato será removido permanentemente.</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteMutation.mutate(c.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="md:hidden space-y-3">
                 {filteredContratos.map((c: any) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="font-medium">{c.titulo}</TableCell>
-                    <TableCell>{c.contatos?.name || "—"}</TableCell>
-                    <TableCell>{format(new Date(c.created_at), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
-                    <TableCell><Badge variant={statusColor(c.status)}>{c.status ?? "gerado"}</Badge></TableCell>
-                    <TableCell className="text-right space-x-1">
+                  <div key={c.id} className="rounded-lg border border-border/50 p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">{c.titulo}</span>
+                      <Badge variant={statusColor(c.status)}>{c.status ?? "gerado"}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <span>{c.contatos?.name || "—"}</span>
+                      <span>{format(new Date(c.created_at), "dd/MM/yyyy", { locale: ptBR })}</span>
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setViewContrato(c)}>
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Select onValueChange={(v) => updateStatusMutation.mutate({ id: c.id, status: v })}>
-                        <SelectTrigger className="w-[120px] h-8 text-xs inline-flex">
+                        <SelectTrigger className="h-8 text-xs flex-1">
                           <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -260,7 +313,7 @@ export default function Contratos() {
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Excluir contrato?</AlertDialogTitle>
-                            <AlertDialogDescription>Esta ação não pode ser desfeita. O contrato será removido permanentemente.</AlertDialogDescription>
+                            <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
@@ -268,11 +321,11 @@ export default function Contratos() {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
