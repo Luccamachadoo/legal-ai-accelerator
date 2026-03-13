@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Plus, Trash2, ExternalLink, Clock, Search } from "lucide-react";
+import { TableSkeletonRows } from "@/components/TableSkeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -186,7 +187,18 @@ export default function Agendamentos() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-muted-foreground">Carregando...</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Data/Hora</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Link</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableSkeletonRows rows={5} columns={5} />
+            </Table>
           ) : !filteredAgendamentos.length ? (
             <p className="text-muted-foreground">
               {agendamentos?.length ? "Nenhum agendamento encontrado com os filtros aplicados." : "Nenhum agendamento encontrado. Crie o primeiro!"}

@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { FileSignature, Plus, Trash2, Eye, Download, Search } from "lucide-react";
+import { TableSkeletonRows } from "@/components/TableSkeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -202,7 +203,18 @@ export default function Contratos() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-muted-foreground">Carregando...</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableSkeletonRows rows={5} columns={5} />
+            </Table>
           ) : !filteredContratos.length ? (
             <p className="text-muted-foreground">
               {contratos?.length ? "Nenhum contrato encontrado com os filtros aplicados." : "Nenhum contrato encontrado. Crie o primeiro!"}

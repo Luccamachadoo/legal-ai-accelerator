@@ -11,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Search, Filter, Download, Inbox, ChevronLeft, ChevronRight, Wand2, Loader2 } from "lucide-react";
+import { TableSkeletonRows } from "@/components/TableSkeleton";
 import { useState } from "react";
 import { useContatos } from "@/hooks/useData";
 import { useCalculateScore } from "@/hooks/useAIScore";
@@ -138,9 +139,19 @@ export default function Contatos() {
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
-              Carregando...
-            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead>Demanda</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Score</TableHead>
+                  <TableHead className="text-right">Última Msg</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableSkeletonRows rows={6} columns={6} />
+            </Table>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground text-sm gap-2">
               <Inbox className="h-8 w-8" />
