@@ -204,37 +204,93 @@ export default function Agendamentos() {
               {agendamentos?.length ? "Nenhum agendamento encontrado com os filtros aplicados." : "Nenhum agendamento encontrado. Crie o primeiro!"}
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Data/Hora</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Link</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop table */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Contato</TableHead>
+                      <TableHead>Data/Hora</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Link</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredAgendamentos.map((a: any) => (
+                      <TableRow key={a.id}>
+                        <TableCell className="font-medium">{a.contatos?.name || "—"}</TableCell>
+                        <TableCell>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                            {format(new Date(a.data_hora), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          </span>
+                        </TableCell>
+                        <TableCell><Badge variant={statusColor(a.status)}>{a.status ?? "agendado"}</Badge></TableCell>
+                        <TableCell>
+                          {a.link_reuniao ? (
+                            <a href={a.link_reuniao} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
+                              <ExternalLink className="h-3.5 w-3.5" /> Abrir
+                            </a>
+                          ) : "—"}
+                        </TableCell>
+                        <TableCell className="text-right space-x-1">
+                          <Select onValueChange={(v) => updateStatusMutation.mutate({ id: a.id, status: v })}>
+                            <SelectTrigger className="w-[130px] h-8 text-xs inline-flex">
+                              <SelectValue placeholder="Alterar status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="agendado">Agendado</SelectItem>
+                              <SelectItem value="confirmado">Confirmado</SelectItem>
+                              <SelectItem value="realizado">Realizado</SelectItem>
+                              <SelectItem value="cancelado">Cancelado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Excluir agendamento?</AlertDialogTitle>
+                                <AlertDialogDescription>Esta ação não pode ser desfeita. O agendamento será removido permanentemente.</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteMutation.mutate(a.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="md:hidden space-y-3">
                 {filteredAgendamentos.map((a: any) => (
-                  <TableRow key={a.id}>
-                    <TableCell className="font-medium">{a.contatos?.name || "—"}</TableCell>
-                    <TableCell>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                        {format(new Date(a.data_hora), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                      </span>
-                    </TableCell>
-                    <TableCell><Badge variant={statusColor(a.status)}>{a.status ?? "agendado"}</Badge></TableCell>
-                    <TableCell>
-                      {a.link_reuniao ? (
-                        <a href={a.link_reuniao} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
-                          <ExternalLink className="h-3.5 w-3.5" /> Abrir
-                        </a>
-                      ) : "—"}
-                    </TableCell>
-                    <TableCell className="text-right space-x-1">
+                  <div key={a.id} className="rounded-lg border border-border/50 p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">{a.contatos?.name || "—"}</span>
+                      <Badge variant={statusColor(a.status)}>{a.status ?? "agendado"}</Badge>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Clock className="h-3.5 w-3.5" />
+                      {format(new Date(a.data_hora), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                    </div>
+                    {a.link_reuniao && (
+                      <a href={a.link_reuniao} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1 text-sm">
+                        <ExternalLink className="h-3.5 w-3.5" /> Link da reunião
+                      </a>
+                    )}
+                    <div className="flex items-center gap-2 pt-1">
                       <Select onValueChange={(v) => updateStatusMutation.mutate({ id: a.id, status: v })}>
-                        <SelectTrigger className="w-[130px] h-8 text-xs inline-flex">
+                        <SelectTrigger className="h-8 text-xs flex-1">
                           <SelectValue placeholder="Alterar status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -253,7 +309,7 @@ export default function Agendamentos() {
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Excluir agendamento?</AlertDialogTitle>
-                            <AlertDialogDescription>Esta ação não pode ser desfeita. O agendamento será removido permanentemente.</AlertDialogDescription>
+                            <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
@@ -261,11 +317,11 @@ export default function Agendamentos() {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
