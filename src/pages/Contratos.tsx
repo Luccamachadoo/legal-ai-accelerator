@@ -203,7 +203,18 @@ export default function Contratos() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-muted-foreground">Carregando...</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableSkeletonRows rows={5} columns={5} />
+            </Table>
           ) : !filteredContratos.length ? (
             <p className="text-muted-foreground">
               {contratos?.length ? "Nenhum contrato encontrado com os filtros aplicados." : "Nenhum contrato encontrado. Crie o primeiro!"}
